@@ -1,5 +1,13 @@
 *.class
 
+# Build directories
+/react/node_modules/*
+/target/*
+
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/libraries/*.xml
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 

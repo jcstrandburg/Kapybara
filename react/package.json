@@ -1,0 +1,41 @@
+{
+  "name": "kapybara",
+  "version": "0.0.1",
+  "description": "Kapybara SPA Client Side",
+  "main": "main.js",
+  "dependencies": {
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-preset-es2015": "^6.24.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-redux": "^5.0.3",
+    "react-router-dom": "^4.0.0",
+    "redux": "^3.6.0",
+    "webpack": "^2.4.1",
+    "webpack-dev-server": "^2.4.2"
+  },
+  "devDependencies": {
+    "babel-jest": "^19.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "jest": "^19.0.2"
+  },
+  "scripts": {
+    "bundle": "webpack --config webpack.config.js",
+    "bundle:watch": "webpack --config webpack.config.js --colors --progress --watch",
+    "start": "webpack-dev-server --hot",
+    "test": "jest",
+    "test:watch": "npm test -- --watch",
+    "deploy-assets": "python deploy-assets.py"
+  },
+  "loaders": {
+    "loaders": [
+      "babel"
+    ]
+  },
+  "author": "Justin Strandburg",
+  "license": "ISC"
+}
