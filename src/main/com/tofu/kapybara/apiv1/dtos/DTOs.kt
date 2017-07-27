@@ -12,3 +12,6 @@ data class OrganizationSummaryDto(val id: Int, val name: String, val token: Stri
 data class UserDto(val id: Int, val name: String, val alias: String): Dto()
 data class CurrentUserDto(val user: UserDto, val organizations: Collection<OrganizationSummaryDto>): Dto()
 data class OrganizationCreateDto(val organization: OrganizationSummaryDto)
+data class ProjectCreateDto(val name: String, val organizationId: Int)
+data class ProjectSummaryDto(val id: Int, val name: String, val organizationId: Int)
+

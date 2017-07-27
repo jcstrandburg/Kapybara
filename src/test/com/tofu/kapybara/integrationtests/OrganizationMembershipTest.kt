@@ -1,6 +1,7 @@
 package com.tofu.kapybara.integrationtests
 
 import com.tofu.kapybara.data.models.Organization
+import com.tofu.kapybara.data.models.OrganizationCreate
 import com.tofu.kapybara.data.models.User
 import com.tofu.kapybara.services.MysqlOrganizationRepository
 import com.tofu.kapybara.services.MysqlUserRepository
@@ -106,8 +107,7 @@ class OrganizationMembershipTest: TestCase() {
     }
 
     private fun createTestOrg(): Organization {
-        return organizationRepository.createOrganization(Organization(
-            id=-1,
+        return organizationRepository.createOrganization(OrganizationCreate(
             name="Test Organization",
             token=UUID.randomUUID().toString()))
     }

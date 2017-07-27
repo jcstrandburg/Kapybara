@@ -1,6 +1,6 @@
 package com.tofu.kapybara.integrationtests
 
-import com.tofu.kapybara.data.models.Organization
+import com.tofu.kapybara.data.models.OrganizationCreate
 import com.tofu.kapybara.services.MysqlOrganizationRepository
 import com.tofu.kapybara.services.getConfig
 import junit.framework.TestCase
@@ -12,7 +12,7 @@ class OrganizationRepositoryTest : TestCase() {
 
     @Test
     fun testCreateAndRetrieve() {
-        val createdOrg = repository.createOrganization(Organization(-1, "OrganizationRepositoryTest organization", UUID.randomUUID().toString()))
+        val createdOrg = repository.createOrganization(OrganizationCreate("OrganizationRepositoryTest organization", UUID.randomUUID().toString()))
 
         assertEquals(createdOrg, repository.getOrganization(createdOrg.id))
         assertEquals(createdOrg, repository.getOrganization(createdOrg.token))
