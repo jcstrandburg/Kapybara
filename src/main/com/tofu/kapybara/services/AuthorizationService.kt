@@ -38,8 +38,8 @@ class AuthorizationService(val userRepository: IUserRepository) {
     fun hashPassword(plainPassword: String) = BCrypt.hashpw(plainPassword, BCrypt.gensalt(12))!!
 
     fun logOutUser(response: Response) {
-        response.removeCookie("username")
-        response.removeCookie("authToken")
+        response.removeCookie("/", "username")
+        response.removeCookie("/", "authToken")
     }
 
     private fun setCookie(response: Response, name: String, value: String) {
