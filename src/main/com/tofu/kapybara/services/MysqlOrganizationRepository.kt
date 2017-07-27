@@ -2,6 +2,7 @@ package com.tofu.kapybara.services
 
 import com.tofu.kapybara.data.IOrganizationRepository
 import com.tofu.kapybara.data.models.Organization
+import com.tofu.kapybara.data.models.OrganizationCreate
 import com.tofu.kapybara.services.database.DbOrganization
 import com.tofu.kapybara.util.dbFields
 import org.sql2o.Sql2o
@@ -35,7 +36,7 @@ class MysqlOrganizationRepository(private val sql2o: Sql2o) : IOrganizationRepos
         }
     }
 
-    override fun createOrganization(org: Organization): Organization {
+    override fun createOrganization(org: OrganizationCreate): Organization {
         val sql = """
 INSERT INTO `Organizations`
 (name, token)

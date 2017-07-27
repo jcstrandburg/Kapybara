@@ -5,7 +5,7 @@ import com.tofu.kapybara.apiv1.dtos.OrganizationCreateDto
 import com.tofu.kapybara.apiv1.dtos.OrganizationSummaryDto
 import com.tofu.kapybara.data.IOrganizationRepository
 import com.tofu.kapybara.data.IUserRepository
-import com.tofu.kapybara.data.models.Organization
+import com.tofu.kapybara.data.models.OrganizationCreate
 import com.tofu.kapybara.services.AuthorizationService
 import spark.Request
 import spark.Response
@@ -26,12 +26,11 @@ class OrganizationController(
         }
     }
 
-    private fun  createOrganization(req: Request, res: Response): Any? {
+    private fun createOrganization(req: Request, res: Response): Any? {
         val user = authorizationService.getLoggedInUser(req) ?: return halt(401)
 
         val organizationCreate = gson.fromJson(req.body(), OrganizationCreateDto::class.java)
-        val organization = Organization(
-            id=-1,
+        val organization = OrganizationCreate(
             name=organizationCreate.organization.name,
             token=organizationCreate.organization.token)
 
@@ -55,9 +54,10 @@ class OrganizationController(
         val org = organizationRepository.getOrganization(token) ?: return halt(404)
 
         return OrganizationSummaryDto(
-            id=org.id,
-            name=org.name,
-            token=org.token)
+                id=org.id,
+                name=org.name,
+                token=org.token)
+            .toJson()
     }
 
     private val gson = Gson()
