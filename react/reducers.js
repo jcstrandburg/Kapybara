@@ -28,7 +28,7 @@ export function organizationReducer(organizations, action, fetchJson) {
 	case actions.SET_CURRENT_USER:
 		return action.organizations;
 	case actions.ORGANIZATION_UPDATED:
-		return organizations.filter(org => org.id != action.organization.id).concat(organization);
+		return Object.assign({}, organizations, { [org.id]: org });
 	default:
 		return organizations;
 	}

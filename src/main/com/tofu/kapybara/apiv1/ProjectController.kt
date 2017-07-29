@@ -48,17 +48,14 @@ class ProjectController(
     }
 
     private fun getProject(req: Request, res: Response): Any? {
-        val projectId = req.queryParams("projectId").toInt()
-
+        val projectId = req.queryParams("projectId").toIntOrNull() ?: return halt(400)
         val project = projectRepository.getProject(projectId) ?: return halt(404)
-        organizationRepository.getOrganization(project.organizationId) ?: return halt(404)
 
         return ProjectSummaryDto(
                 id=project.id,
                 name=project.name,
                 organizationId=project.organizationId)
             .toJson()
-
     }
 
     private val gson = Gson()

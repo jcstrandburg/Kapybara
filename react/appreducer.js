@@ -3,15 +3,12 @@ import * as actions from './actions';
 import { userReducer, organizationReducer, projectReducer, chatReducer, actionHistory } from './reducers';
 
 const initialState = {
-	user: {		
+	user: {
 	},
-	organizations: [		
-	],
-	projects: [
-	],
-	chatMessages: [
-	],
-	actionHistory: [		
+	organizations: {},
+	projects: {},
+	chatMessages: {},
+	actionHistory: [
 	],
 };
 

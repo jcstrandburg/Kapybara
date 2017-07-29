@@ -14,14 +14,17 @@ import Debugger from './components/Debugger.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 
 function mapStateToProps(state) {
-    var props = { projects: state.projects };
+    var props = {
+        organizations: state.organizations,
+        projects: state.projects
+    };
     return props;
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        onAddProject: (organizationToken, project) => {
-            dispatch(actions.addProject(organizationToken, project))
+        onAddProject: (project) => {
+            dispatch(actions.addProject(project))
         }
     };
 }
@@ -79,7 +82,7 @@ class Kapybara extends React.Component {
                     <Route path="/:org/projects/:projectId" component={({ match }) =>
                         (<Layout route="roberto" organizationToken={match.params.org}>
                             <SProjects
-                                organizationToken={match.params.org}
+                                organization={match.params.org}
                                 projectId={match.params.projectId} />
                         </Layout>)
                     } />

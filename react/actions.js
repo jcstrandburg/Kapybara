@@ -41,13 +41,11 @@ export const DELETE_PROJECT = 'DELETE_PROJECT';
 export const UPDATE_PROJECT = 'UPDATE_PROJECT';
 export const PROJECT_UPDATED = 'PROJECT_UPDATED';
 
-export function addProject(organizationToken, project) {
+export function addProject(project) {
     var action = {
         type: ADD_PROJECT,
-        organizationToken,
         project
     };
-    console.log(action);
     return action;
 }
 

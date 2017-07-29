@@ -30,9 +30,7 @@ const asyncDispatchMiddleware = store => next => action => {
 };
 
 const actionLogMiddleware = store => next => action => {
-    console.log(action);
     next(action);
-    console.log(store.getState())
 }
 
 let store = createStore(appReducer, applyMiddleware(actionLogMiddleware, asyncDispatchMiddleware));

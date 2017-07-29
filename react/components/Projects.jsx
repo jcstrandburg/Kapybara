@@ -58,7 +58,7 @@ class ProjectList extends React.Component {
     render() {
         return (
             <div>
-                {this.props.projects.map(this.renderProject)}
+                {Object.values(this.props.projects).map(this.renderProject)}
             </div>
         );
     }

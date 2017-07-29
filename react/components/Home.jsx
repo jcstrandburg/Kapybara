@@ -20,7 +20,7 @@ export default class Home extends Component {
 
     renderOrganization(org) {
         return (
-            <li key={org.organizationId}>
+            <li key={org.id}>
                 <Link to={'/'+org.token+'/projects'}>{org.name}</Link>
             </li>
         );
@@ -45,7 +45,7 @@ export default class Home extends Component {
                 <br />
                 <div>Home</div>
                 <ul>
-                    {this.props.organizations.map(this.renderOrganization)}
+                    {Object.values(this.props.organizations).map(this.renderOrganization)}
                 </ul>
 
                 <form onSubmit={this.handleSubmit}>
