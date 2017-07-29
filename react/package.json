@@ -1,5 +1,9 @@
 {
   "name": "kapybara",
+  "jest": {
+    "browser": true,
+    "verbose": true
+  },
   "version": "0.0.1",
   "description": "Kapybara SPA Client Side",
   "main": "main.js",

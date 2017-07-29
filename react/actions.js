@@ -8,14 +8,14 @@ export const ORGANIZATION_UPDATED = 'ORGANIZATION_UPDATED';
 export function addOrganization(organization) {
     return {
         type: ADD_ORGANIZATION,
-        organization: organization,
+        organization,
     };
 }
 
 export function organizationUpdated(organization) {    
     return {
         TYPE: ORGANIZATION_UPDATED,
-        organization: organization,
+        organization,
     }
 }
 
@@ -31,8 +31,8 @@ export function fetchCurrentUser() {
 export function setCurrentUser(user, organizations) {
     return {
         type: SET_CURRENT_USER,
-        user: user,
-        organizations: organizations
+        user,
+        organizations
     };
 }
 
@@ -43,16 +43,23 @@ export const PROJECT_UPDATED = 'PROJECT_UPDATED';
 
 export function addProject(organizationToken, project) {
     var action = {
-		type: ADD_PROJECT,
-        organizationToken: organizationToken,
-		project: project
-	};
+        type: ADD_PROJECT,
+        organizationToken,
+        project
+    };
     console.log(action);
     return action;
 }
 
+export function projectUpdated(project) {
+    return {
+        type: PROJECT_UPDATED,
+        project
+    }
+}
+
 export function deleteProject(project) {
-	throw NOT_IMPLEMENTED;
+    throw NOT_IMPLEMENTED;
 }
 
 export const SEND_CHAT = 'SEND_CHAT';

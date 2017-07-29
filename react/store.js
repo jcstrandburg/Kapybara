@@ -1,5 +1,5 @@
 import { createStore, applyMiddleware  } from 'redux';
-import { appReducer } from './reducers';
+import { appReducer } from './appreducer';
 
 // This middleware will just add the property "async dispatch"
 // to actions with the "async" propperty set to true

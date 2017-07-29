@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-import { fetchJson } from '../appclient';
 import ObjectDump from './ObjectDump.jsx';
 
 export default class Home extends Component {

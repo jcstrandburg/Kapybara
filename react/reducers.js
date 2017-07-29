@@ -1,44 +1,6 @@
-import { fetchJson } from './appclient';
 import * as actions from './actions';
 
-const initialState = {
-	user: {		
-	},
-	organizations: [		
-	],
-	projects: [
-	],
-	chatMessages: [
-	],
-	actionHistory: [		
-	],
-};
-
-export function appReducer(state = initialState, action) {
-	switch (action.type) {
-	case actions.FETCH_CURRENT_USER:
-		fetchJson('/api/v1/users/me')
-			.then(result => action.asyncDispatch(actions.setCurrentUser(result.user, result.organizations)));
-		break;
-	}
-
-	var newState = {
-		user: userReducer(state.user, action),
-		organizations: organizationReducer(state.organizations, action),
-		projects: projectReducer(state.projects, action),
-		chatMessages: chatReducer(state.chatMessages, action),
-		actionHistory: state.actionHistory.concat([action]),
-	};
-
-	return newState;
-}
-
-// TODO: kill this
-function getNextProjectId(projects) {
-	return projects.reduce((id, project) => id > project.id ? id : project.id, -1) + 1;
-}
-
-function userReducer(user, action) {
+export function userReducer(user, action, fetchJson) {
 	switch (action.type) {
 	case actions.SET_CURRENT_USER:
 		return action.user;
@@ -48,7 +10,7 @@ function userReducer(user, action) {
 	}
 }
 
-function organizationReducer(organizations, action) {
+export function organizationReducer(organizations, action, fetchJson) {
 	// handle async events
 	switch (action.type) {
 	case actions.ADD_ORGANIZATION:
@@ -72,11 +34,11 @@ function organizationReducer(organizations, action) {
 	}
 }
 
-export function projectReducer(projects = [], action) {
+export function projectReducer(projects = [], action, fetchJson) {
 	// handle async events
 	switch (action.type) {
 	case actions.ADD_PROJECT:
-		fetchJson('/api/v1/'+action.organizationToken+'/projects', {
+		fetchJson('/api/v1/projects', {
 				method: 'POST',
 				body: {
 					project: action.project
@@ -98,7 +60,7 @@ export function projectReducer(projects = [], action) {
 	}
 }
 
-export function chatReducer(messages = [], action) {
+export function chatReducer(messages = [], action, fetchJson) {
 	switch (action.type) {
 	default:
 		return messages;
