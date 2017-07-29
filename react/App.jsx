@@ -44,7 +44,7 @@ var SDebugger = connect(
     }),
 )(Debugger);
 
-class kapybara extends React.Component {
+class Kapybara extends React.Component {
     render() {return (
         <HashRouter>                
             <div>
@@ -96,7 +96,7 @@ class App extends React.Component {
     render() {
         return (
             <Provider store={store}>
-                <kapybara />
+                <Kapybara />
             </Provider>
         );
     }
