@@ -1,9 +1,11 @@
 import React from 'react';
 import { HashRouter, Route, Link, Redirect, Switch } from 'react-router-dom';
 import { Provider, dispatch, connect } from 'react-redux';
-import * as actions from './actions';
 import store from './store';
-import { fetchJson } from './appclient';
+
+import * as projects from './ducks/project';
+import * as organizations from './ducks/organization';
+import { getCurrentUser } from './ducks/root';
 
 import Home from './components/Home.jsx';
 import Projects from './components/Projects.jsx';
@@ -13,26 +15,6 @@ import Layout from './components/Layout.jsx';
 import Debugger from './components/Debugger.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 
-function mapStateToProps(state) {
-    var props = {
-        organizations: state.organizations,
-        projects: state.projects
-    };
-    return props;
-}
-
-function mapDispatchToProps(dispatch) {
-    return {
-        onLoad: (organizationToken) => {
-            dispatch(actions.getOrganization(organizationToken));
-            dispatch(actions.getOrganizationProjects(organizationToken));
-        },
-        addProject: (project) => {
-            dispatch(actions.addProject(project));
-        }
-    };
-}
-
 var SProjects = connect(
     (state) => ({
         organizations: state.organizations,
@@ -40,11 +22,11 @@ var SProjects = connect(
     }),
     (dispatch) => ({
         onLoad: (organizationToken) => {
-            dispatch(actions.getOrganization(organizationToken));
-            dispatch(actions.getOrganizationProjects(organizationToken));
+            dispatch(organizations.getOrganization(organizationToken));
+            dispatch(projects.getOrganizationProjects(organizationToken));
         },
         onAddProject: (project) => {
-            dispatch(actions.addProject(project));
+            dispatch(projects.addProject(project));
         }
     }),
 )(Projects);
@@ -66,8 +48,8 @@ class Kapybara extends React.Component {
                             organizations: state.organizations,
                         }),
                         (dispatch) => ({
-                            onLoad: () => dispatch(actions.fetchCurrentUser()),
-                            createOrganization: (org) => dispatch(actions.addOrganization(org))
+                            onLoad: () => dispatch(getCurrentUser()),
+                            createOrganization: (org) => dispatch(organizations.addOrganization(org))
                         })
                     )(Home)} />
                     <Route path="/:org/chat" component={({ match }) =>

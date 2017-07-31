@@ -14,7 +14,8 @@ export default class Home extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
+        console.log('componentDidMount');
         this.props.onLoad();
     }
 

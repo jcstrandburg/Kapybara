@@ -8,7 +8,7 @@ let defaultHeaders = new Headers({
     'X-CSRFToken': 'things',
 });
 
-export function fetchJson(url, options={}) {
+export default function fetchJson(url, options={}) {
     var method = options.method || 'GET';
 
     var fetchOptions = {
@@ -21,5 +21,9 @@ export function fetchJson(url, options={}) {
         }
     }
     return fetch(url, fetchOptions).
-        then(response => response.json());
+        then(response => {
+            var obj = response.json()
+            console.log(obj);
+            return obj;
+        });
 }
