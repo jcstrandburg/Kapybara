@@ -1,16 +1,18 @@
 package com.tofu.kapybara.apiv1
 
 import com.google.gson.Gson
+import com.tofu.kapybara.apiv1.dtos.OrganizationCollectionDto
 import com.tofu.kapybara.apiv1.dtos.OrganizationCreateDto
 import com.tofu.kapybara.apiv1.dtos.OrganizationSummaryDto
 import com.tofu.kapybara.data.IOrganizationRepository
 import com.tofu.kapybara.data.IUserRepository
+import com.tofu.kapybara.data.models.Organization
+
 import com.tofu.kapybara.data.models.OrganizationCreate
 import com.tofu.kapybara.services.AuthorizationService
 import spark.Request
 import spark.Response
-import spark.Spark.halt
-import spark.Spark.post
+import spark.Spark.*
 
 class OrganizationController(
     private val authorizationService: AuthorizationService,
@@ -21,8 +23,11 @@ class OrganizationController(
         post(Routes.CREATE_ORGANIZATION) { req, res ->
             createOrganization(req, res)
         }
-        post(Routes.GET_ORGANIZATION) { req, res ->
+        get(Routes.GET_ORGANIZATION) { req, res ->
             getOrganization(req, res)
+        }
+        get(Routes.GET_ORGANIZATIONS_FOR_USER) { req, res ->
+            getCurrentUserOrganizations(req, res)
         }
     }
 
@@ -42,23 +47,29 @@ class OrganizationController(
 
         userRepository.addUserToOrganization(user.id, createdOrganization.id)
 
-        return OrganizationSummaryDto(
-                createdOrganization.id,
-                createdOrganization.name,
-                createdOrganization.token)
-            .toJson()
+        return mapToSummary(createdOrganization).toJson()
     }
 
     private fun getOrganization(req: Request, res: Response): Any? {
-        val token = req.queryParams("orgToken")
+        authorizationService.getLoggedInUser(req) ?: return halt(401)
+
+        val token = req.params("orgToken")
         val org = organizationRepository.getOrganization(token) ?: return halt(404)
 
-        return OrganizationSummaryDto(
-                id=org.id,
-                name=org.name,
-                token=org.token)
-            .toJson()
+        return mapToSummary(org).toJson()
+    }
+
+    private fun getCurrentUserOrganizations(req: Request, res: Response): Any? {
+        val user = authorizationService.getLoggedInUser(req) ?: return halt(401)
+
+        val orgs = organizationRepository.getOrganizationsForUser(user.id)
+
+        return OrganizationCollectionDto(orgs.map { mapToSummary(it)}).toJson()
     }
 
     private val gson = Gson()
+}
+
+private fun mapToSummary(org: Organization): OrganizationSummaryDto {
+    return OrganizationSummaryDto(org.id, org.name, org.token)
 }

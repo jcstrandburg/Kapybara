@@ -11,8 +11,10 @@ data class CurrentUserDto(val user: UserDto, val organizations: Collection<Organ
 
 data class OrganizationSummaryDto(val id: Int, val name: String, val token: String): Dto()
 data class OrganizationCreateDto(val organization: OrganizationSummaryDto): Dto()
+data class OrganizationCollectionDto(val organizations: List<OrganizationSummaryDto>): Dto()
 
 data class ProjectSummaryDto(val id: Int, val name: String, val organizationId: Int): Dto()
 data class ProjectCreateDto(val project: ProjectSummaryDto): Dto()
+data class ProjectCollectionDto(val projects: List<ProjectSummaryDto>): Dto()
 
 private val gson = Gson()

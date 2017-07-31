@@ -1,6 +1,7 @@
 package com.tofu.kapybara.apiv1
 
 import com.google.gson.Gson
+import com.tofu.kapybara.apiv1.dtos.ProjectCollectionDto
 import com.tofu.kapybara.apiv1.dtos.ProjectCreateDto
 import com.tofu.kapybara.apiv1.dtos.ProjectSummaryDto
 import com.tofu.kapybara.data.IOrganizationRepository
@@ -19,12 +20,9 @@ class ProjectController(
     val organizationRepository: IOrganizationRepository) {
 
     init {
-        post(Routes.CREATE_PROJECT) { req, res ->
-            createProject(req, res)
-        }
-        get(Routes.GET_PROJECT) { req, res ->
-            getProject(req, res)
-        }
+        post(Routes.CREATE_PROJECT) { req, res -> createProject(req, res) }
+        get(Routes.GET_PROJECT) { req, res -> getProject(req, res) }
+        get(Routes.GET_PROJECTS_FOR_ORGANIZATION) { req, res -> getProjectsForOrganization(req, res) }
     }
 
     private fun createProject(req: Request, res: Response): Any? {
@@ -48,13 +46,26 @@ class ProjectController(
     }
 
     private fun getProject(req: Request, res: Response): Any? {
-        val projectId = req.queryParams("projectId").toIntOrNull() ?: return halt(400)
+        val user = authorizationService.getLoggedInUser(req) ?: return halt(401)
+
+        val projectId = req.params("projectId").toIntOrNull() ?: return halt(400)
         val project = projectRepository.getProject(projectId) ?: return halt(404)
 
         return ProjectSummaryDto(
                 id=project.id,
                 name=project.name,
                 organizationId=project.organizationId)
+            .toJson()
+    }
+
+    private fun getProjectsForOrganization(req: Request, res: Response): Any? {
+        val user = authorizationService.getLoggedInUser(req) ?: return halt(401)
+        val orgToken = req.params("orgToken") ?: return halt(400)
+        val organization = organizationRepository.getOrganization(orgToken) ?: return halt(404)
+
+        val projects = projectRepository.getProjectsForOrganization(organization.id)
+
+        return ProjectCollectionDto(projects.map { ProjectSummaryDto(it.id, it.name, it.organizationId)})
             .toJson()
     }
 

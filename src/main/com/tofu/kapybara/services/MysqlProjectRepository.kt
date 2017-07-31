@@ -43,4 +43,14 @@ VALUES
 
         return getProject(id.toInt())!!
     }
+
+    override fun getProjectsForOrganization(organizationId: Int): List<Project> {
+        val sql = "SELECT ${dbFields(Project::class)} FROM `Projects` WHERE organizationId=:organizationId"
+
+        val dbProjects = sql2o.open().createQuery(sql).use {query ->
+            query.addParameter("organizationId", organizationId).executeAndFetch(DbProject::class.java)
+        }
+
+        return dbProjects.map {it -> it.map()}
+    }
 }
