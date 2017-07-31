@@ -13,6 +13,7 @@ const initialState = {
 };
 
 export function appReducer(state = initialState, action) {
+	console.log(action);
 	switch (action.type) {
 	case actions.FETCH_CURRENT_USER:
 		fetchJson('/api/v1/users/me')

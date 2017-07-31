@@ -23,22 +23,30 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        onAddProject: (project) => {
-            dispatch(actions.addProject(project))
+        onLoad: (organizationToken) => {
+            dispatch(actions.getOrganization(organizationToken));
+            dispatch(actions.getOrganizationProjects(organizationToken));
+        },
+        addProject: (project) => {
+            dispatch(actions.addProject(project));
         }
     };
 }
 
-var SHome = connect(
-    state => ({}),
-    dispatch => ({
-        createOrganization: organization => dispatch(actions.addOrganization(organization)),
-    })
-);
-
 var SProjects = connect(
-    mapStateToProps,
-    mapDispatchToProps,
+    (state) => ({
+        organizations: state.organizations,
+        projects: state.projects
+    }),
+    (dispatch) => ({
+        onLoad: (organizationToken) => {
+            dispatch(actions.getOrganization(organizationToken));
+            dispatch(actions.getOrganizationProjects(organizationToken));
+        },
+        onAddProject: (project) => {
+            dispatch(actions.addProject(project));
+        }
+    }),
 )(Projects);
 
 var SDebugger = connect(
@@ -49,7 +57,7 @@ var SDebugger = connect(
 
 class Kapybara extends React.Component {
     render() {return (
-        <HashRouter>                
+        <HashRouter>
             <div>
                 <Switch>
                     <Route exact path="/" component={connect(

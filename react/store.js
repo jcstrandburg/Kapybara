@@ -2,7 +2,6 @@ import { createStore, applyMiddleware  } from 'redux';
 import { appReducer } from './appreducer';
 
 // This middleware will just add the property "async dispatch"
-// to actions with the "async" propperty set to true
 // http://stackoverflow.com/questions/36730793/dispatch-action-in-reducer
 const asyncDispatchMiddleware = store => next => action => {
   let syncActivityFinished = false;
@@ -21,8 +20,7 @@ const asyncDispatchMiddleware = store => next => action => {
     }
   }
 
-  const actionWithAsyncDispatch =
-    Object.assign({}, action, { asyncDispatch });
+  const actionWithAsyncDispatch = Object.assign({}, action, { asyncDispatch });
 
   next(actionWithAsyncDispatch);
   syncActivityFinished = true;

@@ -2,6 +2,48 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import * as actions from '../actions';
 
+export default class Projects extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            match: props.match,
+            projects: this.props.projects,
+        };
+        this.addProject = this.addProject.bind(this);
+        this.getOrganizationId = this.getOrganizationId.bind(this);
+    }
+
+    componentWillMount() {
+        this.props.onLoad(this.props.organizationToken);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({
+            projects: nextProps.projects,
+        });
+    }
+
+    addProject(projectName) {
+        this.props.onAddProject({ name: projectName, organizationId: this.getOrganizationId() });
+    }
+
+    getOrganizationId() {
+        console.log(this);
+        return this.props.organizations[this.props.organizationToken].id;
+    }
+
+    render() {
+        return (
+            <div>
+                Projects<br />
+                <ProjectList projects={this.state.projects} />
+                <AddProject addProject={this.addProject}/>
+            </div>
+        );
+    }
+}
+
 class AddProject extends React.Component {
     constructor(props) {
         super(props);
@@ -59,41 +101,6 @@ class ProjectList extends React.Component {
         return (
             <div>
                 {Object.values(this.props.projects).map(this.renderProject)}
-            </div>
-        );
-    }
-}
-
-export default class Projects extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            match: props.match,
-            projects: this.props.projects,
-        };
-        this.addProject = this.addProject.bind(this);
-    }
-
-    componentWillMount() {
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.setState({
-            projects: nextProps.projects,
-        });
-    }
-
-    addProject(projectName) {
-        this.props.onAddProject(this.props.organizationToken, { name: projectName });
-    }
-
-    render() {
-        return (
-            <div>
-                Projects<br />
-                <ProjectList projects={this.state.projects} />
-                <AddProject addProject={this.addProject}/>
             </div>
         );
     }

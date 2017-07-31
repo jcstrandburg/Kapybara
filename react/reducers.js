@@ -1,5 +1,12 @@
 import * as actions from './actions';
 
+function toDict(data, keySelector) {
+	return data.reduce((map, it) => {
+		map[keySelector(it)] = it;
+		return map;
+	}, {});
+}
+
 export function userReducer(user, action, fetchJson) {
 	switch (action.type) {
 	case actions.SET_CURRENT_USER:
@@ -16,19 +23,23 @@ export function organizationReducer(organizations, action, fetchJson) {
 	case actions.ADD_ORGANIZATION:
 		fetchJson('/api/v1/organizations', {
 				method: 'POST',
-				body: {
-					organization: action.organization,
-				},
+				body: {	organization: action.organization },
 			})
-			.then(result => action.asyncDispatch(actions.organizationUpdated(result.organization)));
+			.then(result => action.asyncDispatch(actions.organizationUpdated(result)));
 		break;
+	case actions.GET_ORGANIZATION:
+		fetchJson('/api/v1/organizations/'+action.token, {
+				method: 'GET',
+			})
+			.then(result => action.asyncDispatch(actions.organizationUpdated(result)));
+		break;	
 	}
 
 	switch (action.type) {
-	case actions.SET_CURRENT_USER:
-		return action.organizations;
+	case actions.SET_CURRENT_USER: 
+		return Object.assign({}, organizations, toDict(action.organizations, it => it.token));
 	case actions.ORGANIZATION_UPDATED:
-		return Object.assign({}, organizations, { [org.id]: org });
+		return Object.assign({}, organizations, toDict([action.organization], it => it.token));
 	default:
 		return organizations;
 	}
@@ -40,21 +51,25 @@ export function projectReducer(projects = [], action, fetchJson) {
 	case actions.ADD_PROJECT:
 		fetchJson('/api/v1/projects', {
 				method: 'POST',
-				body: {
-					project: action.project
-				}
+				body: { project: action.project }
 			})
-			.then(result => action.asyncDispatch(actions.projectUpdated(result.project)));
+			.then(result => action.asyncDispatch(actions.projectUpdated(result)));
 		break;
+	case actions.GET_PROJECTS_FOR_ORGANIZATION:
+		fetchJson('/api/v1/organizations/'+action.organizationToken+'/projects')
+			.then(result => {
+				action.asyncDispatch(actions.projectsUpdated(result.projects))
+			})
 	}
 
 	switch (action.type) {
 	case actions.PROJECT_UPDATED:
-		return projects.filter(p => p.id != action.project.id).concat(action.project);
-		return;
+		return Object.assign({}, projects, toDict([action.project], it => it.id));	
 	case actions.DELETE_PROJECT:
-		// TODO: move this to the async section
-		return projects.filter((proj) => proj.id != action.project.id);
+		throw "not implemented";
+	case actions.PROJECTS_UPDATED:
+		return Object.assign({}, projects, toDict(action.projects, it => it.id));
+		return;
 	default:
 		return projects;
 	}
