@@ -47,3 +47,24 @@ div.chatOutput {
     background-color: rgb(153, 204, 255);
     padding: 2px;
 }
+
+.debug-content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.debug-history-item-type {
+    background: black;
+    color: white;
+}
+
+.debug-history-item-propname {
+    display: inline-block;
+    font-style: italic;
+}
+
+.debug-history-item-propvalue {
+    display: inline-block;
+    font-family: monospace;
+    white-space: pre;
+}

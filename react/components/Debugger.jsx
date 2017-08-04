@@ -1,9 +1,58 @@
 import React from 'react';
+import uuid from 'uuid/v4';
+
+class ObjectDump extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div><pre>{JSON.stringify(this.props.object, null, 2)}</pre></div>
+        );
+    }
+}
+
+class ActionHistory extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.renderHistoryItem = this.renderHistoryItem.bind(this);
+    }
+
+    renderItemProperty(propName, propValue) {
+        return (
+            <div className="debug-history-item-property" key={uuid()}>
+                <div className="debug-history-item-propname">{propName}:</div>
+                <div className="debug-history-item-propvalue">{JSON.stringify(propValue)}</div>
+            </div>
+        );
+    }
+
+    renderHistoryItem(item) {
+        let { type, asyncDispatch, ...properties } = item;
+
+        return (
+            <div className="debug-history-item" key={uuid()}>
+                <div className="debug-history-item-type">{type}: </div>
+                {Object.keys(properties).map(key => this.renderItemProperty(key, properties[key]))}
+            </div>
+        );
+    }
+
+    render() {
+        return (
+            <div className="debug-history">
+                {this.props.history.slice().reverse().map(this.renderHistoryItem)}
+            </div>
+        );
+    }
+}
 
 export default class Debugger extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {open: false};
+        this.state = { open: false };
         this.toggle = this.toggle.bind(this);
     }
 
@@ -15,10 +64,13 @@ export default class Debugger extends React.Component {
         return (
             <div>
                 <div onClick={this.toggle}>Debugger</div>
-                {this.state.open ?
-                (<pre>
-                    {JSON.stringify(this.props.state, null, 2)}
-                </pre>) : null}
+                {this.state.open
+                    ? (
+                        <div className="debug-content">
+                            <ObjectDump object={this.props.state} />
+                            <ActionHistory history={this.props.actionHistory} />
+                        </div>)
+                    : null}
             </div>
         );
     }

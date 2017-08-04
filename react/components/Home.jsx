@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-import ObjectDump from './ObjectDump.jsx';
-
 export default class Home extends Component {
     constructor() {
         super();
@@ -55,9 +53,6 @@ export default class Home extends Component {
                     </label>
                     <input type="submit" value="Create Organization" />
                 </form>
-
-                <ObjectDump dataName="User" data={this.props.user} />
-                <ObjectDump dataName="Organizations" data={this.props.organizations} />
             </div>
         );
     }   

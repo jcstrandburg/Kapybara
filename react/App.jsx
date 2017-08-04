@@ -32,9 +32,15 @@ var SProjects = connect(
 )(Projects);
 
 var SDebugger = connect(
-    (state) => ({
-        state: state
-    }),
+    (state) => {
+        let { actionHistory, ...coreState } = state;
+
+        console.log([actionHistory, coreState]);
+        return {
+            state: coreState,
+            actionHistory
+        };
+    },
 )(Debugger);
 
 class Kapybara extends React.Component {
