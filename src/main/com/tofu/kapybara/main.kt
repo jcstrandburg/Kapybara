@@ -8,7 +8,6 @@ import org.sql2o.Sql2o
 import spark.Spark.*
 
 fun main(args: Array<String>) {
-
     val config = getConfig()
     val sql2o = Sql2o(config.databaseConnectionString, config.databaseUser, config.databasePassword)
 

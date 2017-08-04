@@ -4,6 +4,9 @@ const stuff = (map, key, it) => {
 }
 
 export default (data, keySelector) => {
+    if (data == null)
+        throw new Error("Argument null: data");
+
     if (!data.reduce)
         throw new Error("Data must be reducable");
 

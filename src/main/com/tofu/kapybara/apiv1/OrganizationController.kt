@@ -47,6 +47,7 @@ class OrganizationController(
 
         userRepository.addUserToOrganization(user.id, createdOrganization.id)
 
+        res.status(201)
         return mapToSummary(createdOrganization).toJson()
     }
 

@@ -1,4 +1,6 @@
 import fetchJson from '../util/fetchJson';
+import appClient from '../util/appClient';
+import * as httpCodes from '../util/appClient';
 import projectReducer from './project';
 import { default as organizationReducer, organizationsUpdated } from './organization';
 
@@ -23,27 +25,27 @@ export function setCurrentUser(user, organizations) {
 
 export default function reducer(state = initialState, action) {
 	console.log(action);
+
+	// handle async events
 	switch (action.type) {
 	case GET_CURRENT_USER:
-		fetchJson('/api/v1/users/me')
-			.then(result => {
-				console.log(result);
-				return action.asyncDispatch(setCurrentUser(result.user, result.organizations))
+		appClient.get('users/me', {
+				[httpCodes.OK]: body => action.asyncDispatch(setCurrentUser(body.user, body.organizations))
 			});
 		break;
 	}
 
 	var newState = {
 		user: state.user,
-		organizations: organizationReducer(state.organizations, action, fetchJson),
-		projects: projectReducer(state.projects, action, fetchJson),
+		organizations: organizationReducer(state.organizations, action, fetchJson, appClient),
+		projects: projectReducer(state.projects, action, fetchJson, appClient),
 		actionHistory: state.actionHistory.concat([action]),
 	};
 
 	switch (action.type) {
 	case SET_CURRENT_USER:
 		action.asyncDispatch(organizationsUpdated(action.organizations));
-		Object.assign({}, newState, { user: action.user });
+		return Object.assign({}, newState, { user: action.user });
 	}
 
 	return newState;

@@ -1,29 +1,15 @@
-//let csrftoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
-let csrftoken = "";
-
-// todo remove 'things' default value here, it makes no sense
 let defaultHeaders = new Headers({
     'Accept': 'application/json',
     'Content-Type': 'application/json',
-    'X-CSRFToken': 'things',
 });
 
 export default function fetchJson(url, options={}) {
-    var method = options.method || 'GET';
-
     var fetchOptions = {
         credentials: "same-origin",
         method: options.method || 'GET',
         body: JSON.stringify(options.body),
-        headers: {
-            defaultHeaders,
-            'X-CSRFToken': csrftoken,
-        }
+        headers: defaultHeaders
     }
     return fetch(url, fetchOptions).
-        then(response => {
-            var obj = response.json()
-            console.log(obj);
-            return obj;
-        });
+        then(response => response.json());
 }

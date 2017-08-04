@@ -1,4 +1,5 @@
 import toDict from '../util/toDict';
+import * as httpCodes from '../util/appClient';
 
 const ADD = 'ORGANIZATION/ADD';
 const UPDATED = 'ORGANIZATION/UPDATED';
@@ -16,28 +17,25 @@ export function getOrganization(token) {
     return { type: GET, token }
 }
 
-export default function reducer(organizations, action, fetchJson) {
-	// handle async events
-	switch (action.type) {
-	case ADD:
-        fetchJson('/api/v1/organizations', {
-                method: 'POST',
-                body: {	organization: action.organization },
-            })
-			.then(result => action.asyncDispatch(organizationsUpdated([result])));
-		break;
-	case GET:
-		fetchJson('/api/v1/organizations/'+action.token, {
-				method: 'GET',
-			})
-			.then(result => action.asyncDispatch(organizationsUpdated([result])));
-		break;	
-	}
+export default function reducer(organizations, action, fetchJson, appClient) {
+    // handle async events
+    switch (action.type) {
+    case ADD:
+        appClient.post('organizations', { organization: action.organization }, {
+                [httpCodes.CREATED]: organization => action.asyncDispatch(organizationsUpdated([organization]))
+            });
+        break;
+    case GET:
+        appClient.get('organizations/'+action.token, {
+                [httpCodes.OK]: organization => action.asyncDispatch(organizationsUpdated([organization]))
+            });
+        break;
+    }
 
-	switch (action.type) {
+    switch (action.type) {
     case UPDATED:
-		return Object.assign({}, organizations, toDict(action.organizations, it => it.token));
-	default:
-		return organizations;
-	}
+        return Object.assign({}, organizations, toDict(action.organizations, it => it.token));
+    default:
+        return organizations;
+    }
 }
