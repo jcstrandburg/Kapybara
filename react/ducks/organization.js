@@ -1,31 +1,41 @@
 import toDict from '../util/toDict';
 import * as httpCodes from '../util/appClient';
 
-const ADD = 'ORGANIZATION/ADD';
-const UPDATED = 'ORGANIZATION/UPDATED';
-const GET = 'ORGANIZATION/GET';
+const CREATE_ASYNC = 'ORGANIZATION/CREATE_ASYNC';
+const GET_ASYNC = 'ORGANIZATION/GET_ASYNC';
 
-export function addOrganization(organization) {
-    return { type: ADD, organization };
+const UPDATED = 'ORGANIZATION/UPDATED';
+
+export function createOrganization(organization) {
+    if (organization == null)
+        throw new TypeError("Argument null: organization");
+
+    return { type: CREATE_ASYNC, organization };
 }
 
 export function organizationsUpdated(organizations) {
+    if (organizations == null)
+        throw new TypeError("Argument null: organizations");
+
     return { type: UPDATED, organizations }
 }
 
 export function getOrganization(token) {
-    return { type: GET, token }
+    if (token == null)
+        throw new TypeError("Argument null: token");
+
+    return { type: GET_ASYNC, token }
 }
 
 export default function reducer(organizations, action, fetchJson, appClient) {
     // handle async events
     switch (action.type) {
-    case ADD:
+    case CREATE_ASYNC:
         appClient.post('organizations', { organization: action.organization }, {
                 [httpCodes.CREATED]: organization => action.asyncDispatch(organizationsUpdated([organization]))
             });
         break;
-    case GET:
+    case GET_ASYNC:
         appClient.get('organizations/'+action.token, {
                 [httpCodes.OK]: organization => action.asyncDispatch(organizationsUpdated([organization]))
             });

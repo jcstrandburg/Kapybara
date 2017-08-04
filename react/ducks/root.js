@@ -4,7 +4,7 @@ import * as httpCodes from '../util/appClient';
 import projectReducer from './project';
 import { default as organizationReducer, organizationsUpdated } from './organization';
 
-const GET_CURRENT_USER = 'APP/GET_CURRENT_USER';
+const GET_CURRENT_USER_ASYNC = 'APP/GET_CURRENT_USER_ASYNC';
 const SET_CURRENT_USER = 'APP/SET_CURRENT_USER';
 
 const initialState = {
@@ -16,7 +16,7 @@ const initialState = {
 };
 
 export function getCurrentUser() {
-	return { type: GET_CURRENT_USER };
+	return { type: GET_CURRENT_USER_ASYNC };
 }
 
 export function setCurrentUser(user, organizations) {
@@ -28,7 +28,7 @@ export default function reducer(state = initialState, action) {
 
 	// handle async events
 	switch (action.type) {
-	case GET_CURRENT_USER:
+	case GET_CURRENT_USER_ASYNC:
 		appClient.get('users/me', {
 				[httpCodes.OK]: body => action.asyncDispatch(setCurrentUser(body.user, body.organizations))
 			});

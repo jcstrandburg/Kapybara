@@ -41,7 +41,7 @@ export default {
         let fetchOptions = {
             credentials: "same-origin",
             method: 'POST',
-            body,
+            body: JSON.stringify(body),
             headers: defaultHeaders
         }
 

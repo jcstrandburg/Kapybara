@@ -38,6 +38,7 @@ class ProjectController(
 
         val createdProject = projectRepository.createProject(project)
 
+        res.status(201)
         return ProjectSummaryDto(
                 createdProject.id,
                 createdProject.name,

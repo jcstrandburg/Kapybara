@@ -1,16 +1,16 @@
 import toDict from '../util/toDict';
 import * as httpCodes from '../util/appClient';
 
-const ADD = 'PROJECT/ADD';
-const UPDATE = 'PROJECT/UPDATE';
-const UPDATED = 'PROJECT/UPDATED';
-const GET_FOR_ORGANIZATION = 'PROJECT/GET_FOR_ORGANIZATION';
+const CREATE_ASYNC = 'PROJECT/CREATE_ASYNC';
 
-export function addProject(project) {
+const UPDATED = 'PROJECT/UPDATED';
+const GET_FOR_ORGANIZATION_ASYNC = 'PROJECT/GET_FOR_ORGANIZATION_ASYNC';
+
+export function createProject(project) {
     if (project == null)
         throw new TypeError("Argument null: project");
 
-    return { type: ADD, project }
+    return { type: CREATE_ASYNC, project }
 }
 
 export function projectsUpdated(projects) {
@@ -25,7 +25,7 @@ export function getOrganizationProjects(organizationToken) {
         throw new TypeError("Argument null: organizationToken");
 
     return {
-        type: GET_FOR_ORGANIZATION,
+        type: GET_FOR_ORGANIZATION_ASYNC,
         organizationToken,
     }
 }
@@ -33,12 +33,12 @@ export function getOrganizationProjects(organizationToken) {
 export default function reducer(projects = [], action, fetchJson, appClient) {
     // handle async events
     switch (action.type) {
-    case ADD:
+    case CREATE_ASYNC:
         appClient.post('projects', { project: action.project }, {
                 [httpCodes.CREATED]: result => action.asyncDispatch(projectsUpdated([result]))
             });
         break;
-    case GET_FOR_ORGANIZATION:
+    case GET_FOR_ORGANIZATION_ASYNC:
         appClient.get('organizations/'+action.organizationToken+'/projects', {
                 [httpCodes.OK]: result => action.asyncDispatch(projectsUpdated(result.projects))
             });
@@ -46,8 +46,6 @@ export default function reducer(projects = [], action, fetchJson, appClient) {
     }
 
     switch (action.type) {
-    case UPDATE:
-        return Object.assign({}, projects, toDict([action.project], it => it.id));    
     case UPDATED:
         return Object.assign({}, projects, toDict(action.projects, it => it.id));
         return;

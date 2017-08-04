@@ -25,8 +25,8 @@ var SProjects = connect(
             dispatch(organizations.getOrganization(organizationToken));
             dispatch(projects.getOrganizationProjects(organizationToken));
         },
-        onAddProject: (project) => {
-            dispatch(projects.addProject(project));
+        onCreateProject: (project) => {
+            dispatch(projects.createProject(project));
         }
     }),
 )(Projects);
@@ -49,7 +49,7 @@ class Kapybara extends React.Component {
                         }),
                         (dispatch) => ({
                             onLoad: () => dispatch(getCurrentUser()),
-                            createOrganization: (org) => dispatch(organizations.addOrganization(org))
+                            createOrganization: (org) => dispatch(organizations.createOrganization(org))
                         })
                     )(Home)} />
                     <Route path="/:org/chat" component={({ match }) =>
