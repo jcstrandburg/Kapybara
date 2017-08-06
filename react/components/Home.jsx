@@ -7,9 +7,6 @@ export default class Home extends Component {
         this.state = {
             organizationName: "",
         };
-
-        this.handleOrgNameChange = this.handleOrgNameChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentDidMount() {
@@ -25,11 +22,11 @@ export default class Home extends Component {
         );
     }
 
-    handleOrgNameChange(event) {
+    handleOrgNameChange = (event) => {
         this.setState({organizationName: event.target.value})
     }
 
-    handleSubmit(event, form) {
+    handleSubmit = (event, form) => {
         this.props.createOrganization({
             token: this.state.organizationName,
             name: this.state.organizationName

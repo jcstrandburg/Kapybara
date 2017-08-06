@@ -14,13 +14,7 @@ class ObjectDump extends React.Component {
 }
 
 class ActionHistory extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.renderHistoryItem = this.renderHistoryItem.bind(this);
-    }
-
-    renderItemProperty(propName, propValue) {
+    renderItemProperty = (propName, propValue) => {
         return (
             <div className="debug-history-item-property" key={uuid()}>
                 <div className="debug-history-item-propname">{propName}:</div>
@@ -29,7 +23,7 @@ class ActionHistory extends React.Component {
         );
     }
 
-    renderHistoryItem(item) {
+    renderHistoryItem = (item) => {
         let { type, asyncDispatch, ...properties } = item;
 
         return (
@@ -53,10 +47,9 @@ export default class Debugger extends React.Component {
     constructor(props) {
         super(props);
         this.state = { open: false };
-        this.toggle = this.toggle.bind(this);
     }
 
-    toggle(event) {
+    toggle = (event) => {
         this.setState({open: !this.state.open});
     }
 

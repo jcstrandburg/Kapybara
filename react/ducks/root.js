@@ -24,8 +24,6 @@ export function setCurrentUser(user, organizations) {
 }
 
 export default function reducer(state = initialState, action) {
-	console.log(action);
-
 	// handle async events
 	switch (action.type) {
 	case GET_CURRENT_USER_ASYNC:

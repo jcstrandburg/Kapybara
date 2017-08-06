@@ -33,8 +33,7 @@
     "bundle:watch": "webpack --config webpack.config.js --colors --progress --watch",
     "start": "webpack-dev-server --hot",
     "test": "jest",
-    "test:watch": "npm test -- --watch",
-    "deploy-assets": "python deploy-assets.py"
+    "test:watch": "npm test -- --watch"
   },
   "loaders": {
     "loaders": [

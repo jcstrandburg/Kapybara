@@ -9,8 +9,6 @@ export default class Projects extends React.Component {
             match: props.match,
             projects: this.props.projects,
         };
-        this.createProject = this.createProject.bind(this);
-        this.getOrganizationId = this.getOrganizationId.bind(this);
     }
 
     componentWillMount() {
@@ -23,11 +21,11 @@ export default class Projects extends React.Component {
         });
     }
 
-    createProject(projectName) {
+    createProject = (projectName) => {
         this.props.onCreateProject({ name: projectName, organizationId: this.getOrganizationId() });
     }
 
-    getOrganizationId() {
+    getOrganizationId = () => {
         console.log(this);
         return this.props.organizations[this.props.organizationToken].id;
     }
@@ -46,11 +44,9 @@ export default class Projects extends React.Component {
 class CreateProject extends React.Component {
     constructor(props) {
         super(props);
-
-        this.submitForm = this.submitForm.bind(this);
     }
 
-    submitForm(event) {
+    submitForm = (event) => {
         event.preventDefault();
         this.props.createProject(this.input.value);
         this.input.value = null;
@@ -87,10 +83,9 @@ class ProjectLink extends React.Component {
 class ProjectList extends React.Component {
     constructor(props) {
         super(props);
-        this.renderProject = this.renderProject.bind(this);
     }
 
-    renderProject(project) {
+    renderProject = (project) => {
         return (
             <ProjectLink key={project.id} projectId={project.id} projectName={project.name} />
         );
