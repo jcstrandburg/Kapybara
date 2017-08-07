@@ -1,6 +1,7 @@
 package com.tofu.kapybara.integrationtests
 
 import com.tofu.kapybara.data.models.User
+import com.tofu.kapybara.data.models.UserCreate
 import com.tofu.kapybara.services.MysqlUserRepository
 import com.tofu.kapybara.services.getConfig
 import junit.framework.TestCase
@@ -19,12 +20,13 @@ class UserRepositoryTest : TestCase() {
     }
 
     private fun createTestUser(): User {
-        return repository.createUser(User(
-            id = -1,
-            name = UUID.randomUUID().toString(),
+        val uniqueId = UUID.randomUUID().toString()
+        return repository.createUser(UserCreate(
+            name = uniqueId,
             password = "password",
             authToken = "",
-            alias = "UserRepositoryTest user"))
+            alias = "UserRepositoryTest user",
+            email = "$uniqueId@example.com"))
     }
 
     private val config = getConfig()

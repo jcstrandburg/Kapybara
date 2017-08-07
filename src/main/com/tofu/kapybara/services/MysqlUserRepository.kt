@@ -2,28 +2,30 @@ package com.tofu.kapybara.services
 
 import com.tofu.kapybara.data.IUserRepository
 import com.tofu.kapybara.data.models.User
+import com.tofu.kapybara.data.models.UserCreate
 import com.tofu.kapybara.services.database.DbUser
 import com.tofu.kapybara.util.dbFields
 import org.sql2o.Sql2o
 import java.math.BigInteger
 
 private fun DbUser.toUser(): User {
-    return User(this.id, this.username, this.password, this.authToken ?: "", this.alias)
+    return User(this.id, this.username, this.password, this.authToken ?: "", this.alias, this.email)
 }
 
 class MysqlUserRepository(val sql2o: Sql2o): IUserRepository {
 
-    override fun createUser(user: User): User {
+    override fun createUser(user: UserCreate): User {
         val sql = """
 INSERT INTO `Users`
-(username, password, alias)
+(username, password, alias, email)
 VALUES
-(:username,:password, :alias)
+(:username,:password, :alias, :email)
 """
         val userId = sql2o.open().createQuery(sql).use {query ->
             query.addParameter("username", user.name)
                 .addParameter("password", user.password)
                 .addParameter("alias", user.alias)
+                .addParameter("email", user.email)
                 .executeUpdate()
                 .key as BigInteger
         }

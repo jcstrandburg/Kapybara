@@ -6,6 +6,8 @@ import com.tofu.kapybara.data.models.User
 import com.tofu.kapybara.services.MysqlOrganizationRepository
 import com.tofu.kapybara.services.MysqlUserRepository
 import com.tofu.kapybara.services.getConfig
+import createTestOrganization
+import createTestUser
 import junit.framework.TestCase
 import org.junit.Test
 import org.sql2o.Sql2o
@@ -15,25 +17,14 @@ class OrganizationMembershipTest: TestCase() {
 
     override fun setUp() {
         // recreate test users for every test case so we don't have any organization membership noise
-        testUser1 = userRepository.createUser(User(
-                id=-1,
-                name=UUID.randomUUID().toString(),
-                password="",
-                authToken="",
-                alias="Test User 1"))
-
-        testUser2 =userRepository.createUser(User(
-                id=-1,
-                name=UUID.randomUUID().toString(),
-                password="",
-                authToken="",
-                alias="Test User 2"))
+        testUser1 = createTestUser(userRepository)
+        testUser2 = createTestUser(userRepository)
     }
 
     @Test
     fun testIsUserInOrganization() {
-        val org1 = createTestOrg()
-        val org2 = createTestOrg()
+        val org1 = createTestOrganization(organizationRepository)
+        val org2 = createTestOrganization(organizationRepository)
 
         assertFalse(userRepository.isUserInOrganization(testUser1.id, org1.id))
         assertFalse(userRepository.isUserInOrganization(testUser2.id, org1.id))
@@ -69,7 +60,7 @@ class OrganizationMembershipTest: TestCase() {
 
     @Test
     fun testGetOrganizationMembers() {
-        val org = createTestOrg()
+        val org = createTestOrganization(organizationRepository)
 
         assertEquals(0, userRepository.getUsersForOrganization(org.id).size)
 
@@ -85,7 +76,7 @@ class OrganizationMembershipTest: TestCase() {
 
     @Test
     fun testGetOrganizationsForUser() {
-        val org = createTestOrg()
+        val org = createTestOrganization(organizationRepository)
 
         assertEquals(listOf<Int>(), organizationRepository.getOrganizationsForUser(testUser1.id).map{it.id})
         assertEquals(listOf<Int>(), organizationRepository.getOrganizationsForUser(testUser2.id).map{it.id})
@@ -104,12 +95,6 @@ class OrganizationMembershipTest: TestCase() {
 
         assertEquals(listOf<Int>(), organizationRepository.getOrganizationsForUser(testUser1.id).map{it.id})
         assertEquals(listOf(org.id), organizationRepository.getOrganizationsForUser(testUser2.id).map{it.id})
-    }
-
-    private fun createTestOrg(): Organization {
-        return organizationRepository.createOrganization(OrganizationCreate(
-            name="Test Organization",
-            token=UUID.randomUUID().toString()))
     }
 
     private val config = getConfig()

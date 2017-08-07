@@ -11,9 +11,10 @@ fun main(args: Array<String>) {
     val config = getConfig()
     val sql2o = Sql2o(config.databaseConnectionString, config.databaseUser, config.databasePassword)
 
+    val discussionContextService = MysqlDiscussionContextService(sql2o)
     val userRepository = MysqlUserRepository(sql2o)
     val organizationRepository = MysqlOrganizationRepository(sql2o)
-    val projectRepository = MysqlProjectRepository(sql2o)
+    val projectRepository = MysqlProjectRepository(sql2o, discussionContextService)
     val authorizationService = AuthorizationService(userRepository)
 
     port(8080)

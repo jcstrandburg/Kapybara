@@ -2,13 +2,21 @@ package com.tofu.kapybara.services.testing
 
 import com.tofu.kapybara.data.IUserRepository
 import com.tofu.kapybara.data.models.User
+import com.tofu.kapybara.data.models.UserCreate
 import java.util.*
 import kotlin.NoSuchElementException
 
 class InMemoryUserRepository: IUserRepository {
 
-    override fun createUser(user: User): User {
-        val newUser = user.copy(id = nextId++)
+    override fun createUser(user: UserCreate): User {
+        val newUser = User(
+            id = nextId++,
+            name = user.name,
+            password = user.password,
+            authToken = user.authToken,
+            alias = user.alias,
+            email = user.email)
+
         users[user.name] = newUser
         return newUser
     }

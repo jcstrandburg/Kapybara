@@ -1,11 +1,21 @@
 package com.tofu.kapybara.data.models
 
+import java.time.OffsetDateTime
+
 data class User(
     val id: Int,
     val name: String,
     val password: String,
     val authToken: String,
-    val alias: String)
+    val alias: String,
+    val email: String)
+
+data class UserCreate(
+    val name: String,
+    val password: String,
+    val authToken: String,
+    val alias: String,
+    val email: String)
 
 data class Organization(
     val id: Int,
@@ -24,3 +34,13 @@ data class Project(
 data class ProjectCreate(
     val name: String,
     val organizationId: Int)
+
+data class DiscussionMessage(
+    val id: Int,
+    val userId: Int,
+    val content: String,
+    val createdTime: OffsetDateTime)
+
+data class DiscussionMessageCreate(
+    val userId: Int,
+    val content: String)

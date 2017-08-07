@@ -1,9 +1,10 @@
 package com.tofu.kapybara.data
 
 import com.tofu.kapybara.data.models.User
+import com.tofu.kapybara.data.models.UserCreate
 
 interface IUserRepository {
-    fun createUser(user: User): User
+    fun createUser(user: UserCreate): User
     fun getUser(name: String): User?
     fun getUser(id: Int): User?
     fun setUserAuthToken(id: Int, token: String): User
