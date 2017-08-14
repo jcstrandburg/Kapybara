@@ -27,6 +27,9 @@ var SProjects = connect(
         },
         onCreateProject: (project) => {
             dispatch(projects.createProject(project));
+        },
+        getProjectData: (projectId) => {
+            dispatch(projects.getProjectComments(projectId));
         }
     }),
 )(Projects);
@@ -35,7 +38,6 @@ var SDebugger = connect(
     (state) => {
         let { actionHistory, ...coreState } = state;
 
-        console.log([actionHistory, coreState]);
         return {
             state: coreState,
             actionHistory
@@ -70,18 +72,18 @@ class Kapybara extends React.Component {
                                 channelToken={match.params.channel} />
                         </Layout>)
                     } />
-                    <Route path="/:org/projects" component={({ match }) => 
+                    <Route exact path="/:org/projects" component={({ match }) => 
                         (<Layout organizationToken={match.params.org}>
                             <SProjects organizationToken={match.params.org} />
                         </Layout>)
                      } />
-                    <Route path="/:org/projects/:projectId" component={({ match }) =>
-                        (<Layout route="roberto" organizationToken={match.params.org}>
+                    <Route exact path="/:org/projects/:projectId" component={({ match }) =>
+                        (<Layout organizationToken={match.params.org}>
                             <SProjects
-                                organization={match.params.org}
+                                organizationToken={match.params.org}
                                 projectId={match.params.projectId} />
                         </Layout>)
-                    } />
+                    } />                     
                     <Route path="/settings" component={SettingsPanel} />
                     <Route path='/*' component={NotFound} />
                 </Switch>

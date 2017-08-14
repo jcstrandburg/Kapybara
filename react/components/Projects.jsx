@@ -12,10 +12,21 @@ export default class Projects extends React.Component {
     }
 
     componentWillMount() {
+        console.log("componentWillMount");
         this.props.onLoad(this.props.organizationToken);
+        if (this.props.projectId) {
+            this.props.getProjectData(this.props.projectId);
+        }
     }
 
     componentWillReceiveProps(nextProps) {
+        console.log("componentWillReceiveProps");
+        console.log(nextProps);
+
+        if (nextProps.projectId && nextProps.projectId != this.props.projectId) {
+            this.props.getProjectData(nextProps.projectId);
+        }
+
         this.setState({
             projects: nextProps.projects,
         });
@@ -34,7 +45,7 @@ export default class Projects extends React.Component {
         return (
             <div>
                 Projects<br />
-                <ProjectList projects={this.state.projects} />
+                <ProjectList organizationToken={this.props.organizationToken} projects={this.state.projects} />
                 <CreateProject createProject={this.createProject}/>
             </div>
         );
@@ -72,7 +83,7 @@ class ProjectLink extends React.Component {
     render() {
         return (
             <div>
-                <Link to={'/projects/' + this.props.projectId}>
+                <Link to={'/' + this.props.organizationToken + '/projects/' + this.props.projectId}>
                     {this.props.projectName}
                 </Link>
             </div>
@@ -87,7 +98,7 @@ class ProjectList extends React.Component {
 
     renderProject = (project) => {
         return (
-            <ProjectLink key={project.id} projectId={project.id} projectName={project.name} />
+            <ProjectLink key={project.id} organizationToken={this.props.organizationToken} projectId={project.id} projectName={project.name} />
         );
     }
 
