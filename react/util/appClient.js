@@ -25,6 +25,13 @@ const defaultHeaders = new Headers({
 });
 
 export default {
+    urlEncode: (params) => {
+        let notNullParams = Object.keys(params).filter(k => params[k] !== null);
+        if (notNullParams.length) {
+            return '?' + (Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&'));
+        }
+        return '';
+    },
     get: (route, handler = null) => {
         let fetchOptions = {
             credentials: "same-origin",

@@ -29,6 +29,21 @@ class ProjectRepositoryTest: TestCase() {
     }
 
     @Test
+    fun testGetProjectsForOrganizationWithParentage() {
+        val org = createTestOrganization(organizationRepository)
+        val topLevelProject = createTestProject(repository, org.id, null)
+        val childProject = createTestProject(repository, org.id, topLevelProject.id)
+
+        assertEquals(topLevelProject.id, childProject.parentProjectId)
+
+        val fetchedTopLevelProjects = repository.getProjectsForOrganization(org.id, null)
+        assertEquals(topLevelProject, fetchedTopLevelProjects.single())
+
+        val fetchedChildProjects = repository.getProjectsForOrganization(org.id, topLevelProject.id)
+        assertEquals(childProject, fetchedChildProjects.single())
+    }
+
+    @Test
     fun testDiscussionMessages() {
         val user = createTestUser(userRepository)
         val org = createTestOrganization(organizationRepository)

@@ -68,10 +68,10 @@ class ProjectController(
     private fun getProjectsForOrganization(req: Request): Any? {
         authorizationService.getLoggedInUser(req) ?: return halt(401)
         val orgToken = req.params("orgToken") ?: return halt(400)
-        val parentProjectId = req.queryParams("parent")
+        val parentProjectId = req.queryParams("parent")?.toIntOrNull()
         val organization = organizationRepository.getOrganization(orgToken) ?: return halt(404)
 
-        val projects = projectRepository.getProjectsForOrganization(organization.id, null)
+        val projects = projectRepository.getProjectsForOrganization(organization.id, parentProjectId)
 
         return ProjectCollectionDto(projects.map {
                 ProjectSummaryDto(it.id, it.name, it.organizationId, it.parentProjectId)

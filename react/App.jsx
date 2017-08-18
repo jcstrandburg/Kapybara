@@ -30,6 +30,9 @@ const SProjects = connect(
         },
         getProjectData: (projectId) => {
             dispatch(projects.getProjectComments(projectId));
+        },
+        getChildrenProjects: (organizationToken, parentProjectId) => {
+            dispatch(projects.getOrganizationProjects(organizationToken, parentProjectId));
         }
     }),
 )(Projects);
@@ -83,8 +86,13 @@ class Kapybara extends React.Component {
                     )(Home)} />
                     <Route path="/:org" component={(x) =>
                         (<SLayout organizationToken={x.match.params.org}>
-                            <Route path={x.match.url+'/projects'} component={(y) =>
+                            <Route exact path={x.match.url+'/projects'} component={(y) =>
                                 (<SProjects organizationToken={x.match.params.org}>
+                                    <span>Projects go here</span>
+                                </SProjects>)
+                            } />
+                            <Route path={x.match.url+'/projects/:projectId'} component={(y) =>
+                                (<SProjects organizationToken={x.match.params.org} projectId={y.match.params.projectId}>
                                     <span>Projects go here</span>
                                 </SProjects>)
                             } />

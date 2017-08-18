@@ -4,32 +4,29 @@ import { Link } from 'react-router-dom';
 export default class Projects extends React.Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            match: props.match,
-            projects: this.props.projects,
-        };
     }
 
     componentWillMount() {
-        this.props.onLoad(this.props.organizationToken);
+        let { organizationToken, projectId } = this.props;
+
+        this.props.onLoad(organizationToken);
         if (this.props.projectId) {
-            this.props.getProjectData(this.props.projectId);
+            this.props.getProjectData(projectId);
+            this.props.getChildrenProjects(organizationToken, projectId);
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.projectId && nextProps.projectId != this.props.projectId) {
-            this.props.getProjectData(nextProps.projectId);
-        }
+        let { organizationToken, projectId } = nextProps;
 
-        this.setState({
-            projects: nextProps.projects,
-        });
+        if (projectId && projectId != this.props.projectId) {
+            this.props.getProjectData(projectId);
+            this.props.getChildrenProjects(organizationId, projectId);
+        }
     }
 
     createProject = (projectName) => {
-        this.props.onCreateProject({ name: projectName, organizationId: this.getOrganizationId() });
+        this.props.onCreateProject({ name: projectName, organizationId: this.getOrganizationId(), parentProjectId: this.props.projectId });
     }
 
     getOrganizationId = () => {
@@ -40,7 +37,7 @@ export default class Projects extends React.Component {
         return (
             <div>
                 Projects<br />
-                <ProjectList organizationToken={this.props.organizationToken} projects={this.props.projects} />
+                <ProjectList organizationToken={this.props.organizationToken} projects={Object.values(this.props.projects).filter(proj => proj.parentProjectId == this.props.projectId)} />
                 <CreateProject createProject={this.createProject}/>
             </div>
         );

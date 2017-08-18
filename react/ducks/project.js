@@ -16,11 +16,11 @@ export function createProject(project) {
     return { type: CREATE_ASYNC, project };
 }
 
-export function getOrganizationProjects(organizationToken) {
+export function getOrganizationProjects(organizationToken, parentProjectId) {
     if (organizationToken == null)
         throw new TypeError("Argument null: organizationToken");
 
-    return { type: GET_FOR_ORGANIZATION_ASYNC, organizationToken };
+    return { type: GET_FOR_ORGANIZATION_ASYNC, organizationToken, parentProjectId };
 }
 
 export function getProjectComments(projectId) {
@@ -66,7 +66,7 @@ export default function reducer(projects = [], action, fetchJson, appClient) {
             });
         break;
     case GET_FOR_ORGANIZATION_ASYNC:
-        appClient.get('organizations/'+action.organizationToken+'/projects', {
+        appClient.get('organizations/'+action.organizationToken+'/projects'+appClient.urlEncode({ parent: action.parentProjectId }), {
                 [httpCodes.OK]: result => action.asyncDispatch(projectsUpdated(result.projects))
             });
         break;
@@ -87,6 +87,7 @@ export default function reducer(projects = [], action, fetchJson, appClient) {
             });
         break;
     }
+    
 
     switch (action.type) {
     case UPDATED:

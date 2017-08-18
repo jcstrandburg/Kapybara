@@ -37,9 +37,9 @@ class MysqlProjectRepository(
     override fun createProject(project: ProjectCreate): Project {
         val sql = """
 INSERT INTO `Projects`
-    (name, organizationId, discussionContextId)
+    (name, organizationId, discussionContextId, parentProjectId)
 VALUES
-    (:name, :organizationId, :discussionContextId)
+    (:name, :organizationId, :discussionContextId, :parentProjectId)
 """
         val discussionContextId = discussionContextService.createContext()
         val id = sql2o.open().createQuery(sql).use {query ->
@@ -47,6 +47,7 @@ VALUES
                 .addParameter("name", project.name)
                 .addParameter("organizationId", project.organizationId)
                 .addParameter("discussionContextId", discussionContextId)
+                .addParameter("parentProjectId", project.parentProjectId)
                 .executeUpdate()
                 .key as BigInteger
         }
@@ -55,13 +56,25 @@ VALUES
     }
 
     override fun getProjectsForOrganization(organizationId: Int, parentProjectId: Int?): List<Project> {
-        val sql = "SELECT ${dbFields(Project::class)} FROM `Projects` WHERE organizationId=:organizationId AND parentProjectId=:parentProjectId"
+        val sql = """
+SELECT ${dbFields(Project::class)}
+FROM `Projects`
+WHERE
+    organizationId=:organizationId
+    AND ${if (parentProjectId == null) "parentProjectId IS NULL" else "parentProjectId=:parentProjectId"}
+"""
 
         val dbProjects = sql2o.open().createQuery(sql).use {query ->
-            query
-                .addParameter("organizationId", organizationId)
-                .addParameter("parentProjectId", parentProjectId)
-                .executeAndFetch(DbProject::class.java)
+            if (parentProjectId == null) {
+                query
+                    .addParameter("organizationId", organizationId)
+            }
+            else  {
+                query
+                    .addParameter("organizationId", organizationId)
+                    .addParameter("parentProjectId", parentProjectId)
+            }
+            .executeAndFetch(DbProject::class.java)
         }
 
         return dbProjects.map { it -> it.map() }
