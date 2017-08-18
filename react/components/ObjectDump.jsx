@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default class ObjectDump extends React.Component {
     render() {
@@ -11,3 +12,7 @@ export default class ObjectDump extends React.Component {
         );
     }   
 }
+
+ObjectDump.propTypes = {
+    object: PropTypes.object,
+};

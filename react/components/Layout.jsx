@@ -2,12 +2,6 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 export default class Layout extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.props.getProjects(this.props.organizationToken);
-    }
-
     renderChatChannel = (channel) => {(
         <Link to={'/'+this.props.organizationToken+'/chat/channel'}>Chat</Link>
     )}

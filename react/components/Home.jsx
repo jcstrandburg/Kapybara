@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 export default class Home extends Component {
-    constructor() {
-        super();
-        this.state = {
-            organizationName: "",
-        };
-    }
+    state = {
+        organizationName: ""
+    };
 
     componentDidMount() {
         this.props.onLoad();
@@ -53,3 +51,10 @@ export default class Home extends Component {
         );
     }   
 }
+
+Home.propTypes = {
+    createOrganization: PropTypes.func.isRequired,
+    onLoad: PropTypes.func.isRequired,
+
+    organizations: PropTypes.objectOf(PropTypes.object).isRequired,
+};

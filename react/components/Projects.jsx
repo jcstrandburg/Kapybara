@@ -1,16 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 export default class Projects extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     componentWillMount() {
         let { organizationToken, projectId } = this.props;
 
         this.props.onLoad(organizationToken);
-        if (this.props.projectId) {
+        if (projectId) {
             this.props.getProjectData(projectId);
             this.props.getChildrenProjects(organizationToken, projectId);
         }
@@ -44,11 +41,21 @@ export default class Projects extends React.Component {
     }
 }
 
-class CreateProject extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+Projects.propTypes = {
+    organizationToken: PropTypes.string.isRequired,
+    organizations: PropTypes.objectOf(PropTypes.object).isRequired,
+    projectId: PropTypes.string,
 
+    getProjectData: PropTypes.func.isRequired,
+    getChildrenProjects: PropTypes.func.isRequired,
+    onCreateProject: PropTypes.func.isRequired,
+}
+
+Projects.defaultProps = {
+    projectId: null,
+};
+
+class CreateProject extends React.Component {
     submitForm = (event) => {
         event.preventDefault();
         this.props.createProject(this.input.value);
@@ -67,11 +74,11 @@ class CreateProject extends React.Component {
     }
 }
 
-class ProjectLink extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+CreateProject.propTypes = {
+    createProject: PropTypes.func.isRequired,
+};
 
+class ProjectLink extends React.Component {
     render() {
         return (
             <div>
@@ -83,11 +90,11 @@ class ProjectLink extends React.Component {
     }
 }
 
-class ProjectList extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+ProjectLink.propTypes = {
+    organizationToken: PropTypes.string.isRequired,
+};
 
+class ProjectList extends React.Component {
     renderProject = (project) => {
         return (
             <ProjectLink key={project.id} organizationToken={this.props.organizationToken} projectId={project.id} projectName={project.name} />
@@ -102,3 +109,8 @@ class ProjectList extends React.Component {
         );
     }
 }
+
+ProjectList.propTypes = {
+    organizationToken: PropTypes.string.isRequired,
+    projects: PropTypes.arrayOf(PropTypes.object).isRequired,
+};

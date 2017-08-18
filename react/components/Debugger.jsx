@@ -42,10 +42,9 @@ class ActionHistory extends React.Component {
 }
 
 export default class Debugger extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { open: false };
-    }
+    state = {
+        open: true
+    };
 
     toggle = (event) => {
         this.setState({open: !this.state.open});
