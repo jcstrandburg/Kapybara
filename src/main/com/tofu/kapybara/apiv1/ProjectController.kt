@@ -33,8 +33,9 @@ class ProjectController(
 
         val createDto = gson.fromJson(req.body(), ProjectCreateDto::class.java)
         val project = ProjectCreate(
-                name=createDto.project.name,
-                organizationId=createDto.project.organizationId)
+            name=createDto.project.name,
+            organizationId=createDto.project.organizationId,
+            parentProjectId=createDto.project.parentProjectId)
 
         if (!userRepository.isUserInOrganization(user.id, project.organizationId))
             return halt(404)
@@ -45,7 +46,8 @@ class ProjectController(
         return ProjectSummaryDto(
                 createdProject.id,
                 createdProject.name,
-                createdProject.organizationId)
+                createdProject.organizationId,
+                createdProject.parentProjectId)
             .toJson()
     }
 
@@ -58,18 +60,22 @@ class ProjectController(
         return ProjectSummaryDto(
                 id=project.id,
                 name=project.name,
-                organizationId=project.organizationId)
+                organizationId=project.organizationId,
+                parentProjectId=project.parentProjectId)
             .toJson()
     }
 
     private fun getProjectsForOrganization(req: Request): Any? {
         authorizationService.getLoggedInUser(req) ?: return halt(401)
         val orgToken = req.params("orgToken") ?: return halt(400)
+        val parentProjectId = req.queryParams("parent")
         val organization = organizationRepository.getOrganization(orgToken) ?: return halt(404)
 
-        val projects = projectRepository.getProjectsForOrganization(organization.id)
+        val projects = projectRepository.getProjectsForOrganization(organization.id, null)
 
-        return ProjectCollectionDto(projects.map { ProjectSummaryDto(it.id, it.name, it.organizationId)})
+        return ProjectCollectionDto(projects.map {
+                ProjectSummaryDto(it.id, it.name, it.organizationId, it.parentProjectId)
+            })
             .toJson()
     }
 

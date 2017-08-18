@@ -22,7 +22,7 @@ class ProjectRepositoryTest: TestCase() {
     @Test
     fun testCreateAndRetrieve() {
         val org = createTestOrganization(organizationRepository)
-        val createdProject = createTestProject(repository, org.id)
+        val createdProject = createTestProject(repository, org.id, null)
 
         val fetchedProject = repository.getProject(createdProject.id)
         assertEquals(createdProject, fetchedProject)
@@ -32,7 +32,7 @@ class ProjectRepositoryTest: TestCase() {
     fun testDiscussionMessages() {
         val user = createTestUser(userRepository)
         val org = createTestOrganization(organizationRepository)
-        val proj = createTestProject(repository, org.id)
+        val proj = createTestProject(repository, org.id, null)
 
         val messageCreate = DiscussionMessageCreate(user.id, "Message content")
         val message = repository.addDiscussionMessage(proj.id, messageCreate)

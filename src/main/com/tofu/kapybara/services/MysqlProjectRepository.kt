@@ -14,7 +14,7 @@ import java.math.BigInteger
 import java.time.OffsetDateTime
 
 private fun DbProject.map(): Project {
-    return Project(this.id, this.name, this.organizationId)
+    return Project(this.id, this.name, this.organizationId, this.parentProjectId)
 }
 
 private fun DbDiscussionMessage.map(): DiscussionMessage {
@@ -54,11 +54,14 @@ VALUES
         return getProject(id.toInt())!!
     }
 
-    override fun getProjectsForOrganization(organizationId: Int): List<Project> {
-        val sql = "SELECT ${dbFields(Project::class)} FROM `Projects` WHERE organizationId=:organizationId"
+    override fun getProjectsForOrganization(organizationId: Int, parentProjectId: Int?): List<Project> {
+        val sql = "SELECT ${dbFields(Project::class)} FROM `Projects` WHERE organizationId=:organizationId AND parentProjectId=:parentProjectId"
 
         val dbProjects = sql2o.open().createQuery(sql).use {query ->
-            query.addParameter("organizationId", organizationId).executeAndFetch(DbProject::class.java)
+            query
+                .addParameter("organizationId", organizationId)
+                .addParameter("parentProjectId", parentProjectId)
+                .executeAndFetch(DbProject::class.java)
         }
 
         return dbProjects.map { it -> it.map() }

@@ -29,11 +29,13 @@ data class OrganizationCreate(
 data class Project(
     val id: Int,
     val name: String,
-    val organizationId: Int)
+    val organizationId: Int,
+    val parentProjectId: Int?)
 
 data class ProjectCreate(
     val name: String,
-    val organizationId: Int)
+    val organizationId: Int,
+    val parentProjectId: Int?)
 
 data class DiscussionMessage(
     val id: Int,

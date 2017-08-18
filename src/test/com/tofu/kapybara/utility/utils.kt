@@ -22,6 +22,6 @@ fun createTestOrganization(organizationRepository: IOrganizationRepository): Org
         token=uniqueId))
 }
 
-fun createTestProject(projectRepository: IProjectRepository, organizationId: Int): Project {
-    return projectRepository.createProject(ProjectCreate(UUID.randomUUID().toString(), organizationId))
+fun createTestProject(projectRepository: IProjectRepository, organizationId: Int, parentProjectId: Int?): Project {
+    return projectRepository.createProject(ProjectCreate(UUID.randomUUID().toString(), organizationId, parentProjectId))
 }

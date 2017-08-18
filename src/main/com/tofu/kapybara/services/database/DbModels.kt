@@ -19,7 +19,8 @@ data class DbProject(
     val id: Int,
     val name: String,
     val organizationId: Int,
-    val discussionContextId: Int)
+    val discussionContextId: Int,
+    val parentProjectId: Int?)
 
 data class DbDiscussionContext(val id: Int)
 
