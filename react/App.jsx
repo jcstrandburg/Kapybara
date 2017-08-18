@@ -15,7 +15,7 @@ import Layout from './components/Layout.jsx';
 import Debugger from './components/Debugger.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 
-var SProjects = connect(
+const SProjects = connect(
     (state) => ({
         organizations: state.organizations,
         projects: state.projects
@@ -34,7 +34,28 @@ var SProjects = connect(
     }),
 )(Projects);
 
-var SDebugger = connect(
+const SChat = connect(
+    (state) => ({
+        organizations: state.organizations,
+        projects: state.projects
+    }),
+    (dispatch) => ({
+    }),
+)(Chat);
+
+const SLayout = connect(
+    (state) => ({
+        projects: state.projects,
+        chatChannels: [],
+    }),
+    (dispatch) => ({
+        getProjects: (orgToken) => {
+            dispatch(projects.getOrganizationProjects(orgToken));
+        }
+    })
+)(Layout);
+
+const SDebugger = connect(
     (state) => {
         let { actionHistory, ...coreState } = state;
 
@@ -60,30 +81,20 @@ class Kapybara extends React.Component {
                             createOrganization: (org) => dispatch(organizations.createOrganization(org))
                         })
                     )(Home)} />
-                    <Route path="/:org/chat" component={({ match }) =>
-                        (<Layout organizationToken={match.params.org}>
-                            <Chat organizationToken={match.params.org} />
-                        </Layout>)
+                    <Route path="/:org" component={(x) =>
+                        (<SLayout organizationToken={x.match.params.org}>
+                            <Route path={x.match.url+'/projects'} component={(y) =>
+                                (<SProjects organizationToken={x.match.params.org}>
+                                    <span>Projects go here</span>
+                                </SProjects>)
+                            } />
+                            <Route path={x.match.url+'/chat/:channel'} component={(y) =>
+                                (<SChat organizationToken={x.match.params.org} channel={y.match.params.channel}>
+                                    <span>Chat goes here</span>
+                                </SChat>)
+                            } />
+                        </SLayout>)
                     } />
-                    <Route path="/:org/chat/:channel" component={({ match }) => 
-                        (<Layout organizationToken={match.params.org}>
-                            <Chat
-                                organizationToken={match.params.org}
-                                channelToken={match.params.channel} />
-                        </Layout>)
-                    } />
-                    <Route exact path="/:org/projects" component={({ match }) => 
-                        (<Layout organizationToken={match.params.org}>
-                            <SProjects organizationToken={match.params.org} />
-                        </Layout>)
-                     } />
-                    <Route exact path="/:org/projects/:projectId" component={({ match }) =>
-                        (<Layout organizationToken={match.params.org}>
-                            <SProjects
-                                organizationToken={match.params.org}
-                                projectId={match.params.projectId} />
-                        </Layout>)
-                    } />                     
                     <Route path="/settings" component={SettingsPanel} />
                     <Route path='/*' component={NotFound} />
                 </Switch>

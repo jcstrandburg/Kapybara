@@ -12,7 +12,6 @@ export default class Projects extends React.Component {
     }
 
     componentWillMount() {
-        console.log("componentWillMount");
         this.props.onLoad(this.props.organizationToken);
         if (this.props.projectId) {
             this.props.getProjectData(this.props.projectId);
@@ -20,9 +19,6 @@ export default class Projects extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log("componentWillReceiveProps");
-        console.log(nextProps);
-
         if (nextProps.projectId && nextProps.projectId != this.props.projectId) {
             this.props.getProjectData(nextProps.projectId);
         }
@@ -37,7 +33,6 @@ export default class Projects extends React.Component {
     }
 
     getOrganizationId = () => {
-        console.log(this);
         return this.props.organizations[this.props.organizationToken].id;
     }
 
@@ -45,7 +40,7 @@ export default class Projects extends React.Component {
         return (
             <div>
                 Projects<br />
-                <ProjectList organizationToken={this.props.organizationToken} projects={this.state.projects} />
+                <ProjectList organizationToken={this.props.organizationToken} projects={this.props.projects} />
                 <CreateProject createProject={this.createProject}/>
             </div>
         );
