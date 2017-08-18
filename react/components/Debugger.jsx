@@ -46,6 +46,10 @@ export default class Debugger extends React.Component {
         open: true
     };
 
+    state = {
+        activePanel: 1
+    };
+
     toggle = (event) => {
         this.setState({open: !this.state.open});
     }
@@ -56,9 +60,17 @@ export default class Debugger extends React.Component {
                 <div onClick={this.toggle}>Debugger</div>
                 {this.state.open
                     ? (
-                        <div className="debug-content">
-                            <ObjectDump object={this.props.state} />
-                            <ActionHistory history={this.props.actionHistory} />
+                        <div>
+                            <div>
+                                <button onClick={() => this.setState({ activePanel: 1 })}>State</button>
+                                <button onClick={() => this.setState({ activePanel: 2 })}>History</button>
+                            </div>
+                            <div className="debug-content">
+                                {this.state.activePanel == 1
+                                ? <ObjectDump object={this.props.state} />
+                                : <ActionHistory history={this.props.actionHistory} />
+                                }
+                            </div>
                         </div>)
                     : null}
             </div>
