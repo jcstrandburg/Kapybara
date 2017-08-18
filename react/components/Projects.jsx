@@ -49,7 +49,7 @@ Projects.propTypes = {
     getProjectData: PropTypes.func.isRequired,
     getChildrenProjects: PropTypes.func.isRequired,
     onCreateProject: PropTypes.func.isRequired,
-}
+};
 
 Projects.defaultProps = {
     projectId: null,

@@ -7,8 +7,8 @@ export default class Layout extends React.Component {
     )}
 
     render() {return (
-        <div>
-            <div>
+        <div className="layout">
+            <div className="layout-nav">
                 kapybara Header
                 <ul>
                     <li><Link to={'/'+this.props.organizationToken+'/projects'}>Projects</Link></li>
@@ -20,7 +20,7 @@ export default class Layout extends React.Component {
                 </ul>
                 <hr/>
             </div>
-            <div>
+            <div className="layout-content">
                 { this.props.children }
             </div>
         </div>

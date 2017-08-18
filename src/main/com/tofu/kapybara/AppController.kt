@@ -25,7 +25,7 @@ class AppController(val authorizationService: AuthorizationService) {
         <link rel="stylesheet" href="/styles.css?$cacheBuster">
     </head>
     <body>
-        <div id="app">
+        <div id="app" class="app-container">
             Hello world
             <a href="/auth/signout">Log Out</a>
         </div>

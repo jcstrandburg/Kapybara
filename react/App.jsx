@@ -72,7 +72,7 @@ const SDebugger = connect(
 class Kapybara extends React.Component {
     render() {return (
         <BrowserRouter basename="/app">
-            <div>
+            <div className="app-container">
                 <Switch>
                     <Route exact path="/" component={connect(
                         (state)  => ({
@@ -84,39 +84,39 @@ class Kapybara extends React.Component {
                             createOrganization: (org) => dispatch(organizations.createOrganization(org))
                         })
                     )(Home)} />
-                    <Route exact path="/settings" component={SettingsPanel} />                    
+                    <Route exact path="/settings" component={SettingsPanel} />
                     <Route path="/:org" component={(x) =>
                         (<SLayout organizationToken={x.match.params.org}>
                             <Route exact path={x.match.url+'/projects'} component={(y) =>
-                                (<SProjects organizationToken={x.match.params.org}>
-                                    <span>Projects go here</span>
-                                </SProjects>)
+                                (<SProjects organizationToken={x.match.params.org} />)
                             } />
                             <Route path={x.match.url+'/projects/:projectId'} component={(y) =>
-                                (<SProjects organizationToken={x.match.params.org} projectId={y.match.params.projectId}>
-                                    <span>Projects go here</span>
-                                </SProjects>)
+                                (<SProjects organizationToken={x.match.params.org} projectId={y.match.params.projectId} />)
                             } />
                             <Route path={x.match.url+'/chat/:channel'} component={(y) =>
-                                (<SChat organizationToken={x.match.params.org} channel={y.match.params.channel}>
-                                    <span>Chat goes here</span>
-                                </SChat>)
+                                (<SChat organizationToken={x.match.params.org} channel={y.match.params.channel} />)
                             } />
                         </SLayout>)
                     } />
                     <Route path='/*' component={NotFound} />
                 </Switch>
-                <SDebugger />
             </div>
         </BrowserRouter>
     );}
 }
 
+const debugEnabled = true;
+
 class App extends React.Component {
     render() {
         return (
             <Provider store={store}>
-                <Kapybara />
+                <div className="app-container">
+                    <Kapybara />
+                    {debugEnabled
+                        ? <SDebugger />
+                        : null}
+                </div>
             </Provider>
         );
     }

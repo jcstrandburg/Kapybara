@@ -41,6 +41,14 @@ class ActionHistory extends React.Component {
     }
 }
 
+const style = {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    height: '100%',
+    overflow: 'auto',
+};
+
 export default class Debugger extends React.Component {
     state = {
         open: true
@@ -56,14 +64,14 @@ export default class Debugger extends React.Component {
 
     render() {
         return (
-            <div>
-                <div onClick={this.toggle}>Debugger</div>
+            <div style={style} id="debug-panel">
                 {this.state.open
                     ? (
                         <div>
                             <div>
                                 <button onClick={() => this.setState({ activePanel: 1 })}>State</button>
                                 <button onClick={() => this.setState({ activePanel: 2 })}>History</button>
+                                <button onClick={this.toggle}>Hide</button>
                             </div>
                             <div className="debug-content">
                                 {this.state.activePanel == 1
@@ -72,7 +80,7 @@ export default class Debugger extends React.Component {
                                 }
                             </div>
                         </div>)
-                    : null}
+                    : <div onClick={this.toggle}>🐛</div>}
             </div>
         );
     }

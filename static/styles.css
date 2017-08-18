@@ -1,3 +1,33 @@
+html, body, app-container, .layout {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+}
+
+.app-container {
+    height: 100%;
+}
+
+#app > div {
+    height: 100%;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+}
+
+.layout-nav {
+    background: #57d29a;
+    grid-column: 1;
+}
+
+.layout-content {
+    grid-column: 2;
+}
+
 .chatInstanceContainer {
     display: flex;
     flex-flow: row wrap;
@@ -76,4 +106,22 @@ div.chatOutput {
 .debug-history-object-item-propvalue {
     font-family: monospace;
     white-space: pre;
+}
+
+#debug-panel::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+}
+
+#debug-panel::-webkit-scrollbar
+{
+	width: 10px;
+	background-color: #F5F5F5;
+}
+
+#debug-panel::-webkit-scrollbar-thumb
+{
+	background-color: #000000;
+	border: 2px solid #555555;
 }
