@@ -1,24 +1,22 @@
 import React from 'react';
 import uuid from 'uuid/v4';
 
-class ObjectDump extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        return (
-            <div><pre>{JSON.stringify(this.props.object, null, 2)}</pre></div>
-        );
-    }
-}
+import ObjectDump from './ObjectDump.jsx';
 
 class ActionHistory extends React.Component {
     renderItemProperty = (propName, propValue) => {
         return (
             <div className="debug-history-item-property" key={uuid()}>
-                <div className="debug-history-item-propname">{propName}:</div>
-                <div className="debug-history-item-propvalue">{JSON.stringify(propValue)}</div>
+                {typeof propValue === 'object' && propValue != null
+                    ? <div>
+                        <div className="debug-history-object-item-propname">{propName}:</div>
+                        <div className="debug-history-object-item-propvalue">{JSON.stringify(propValue, null, 2)}</div>
+                    </div>
+                    : <div>
+                        <div className="debug-history-scalar-item-propname">{propName}:</div>
+                        <div className="debug-history-scalar-item-propvalue">{JSON.stringify(propValue, null, 2)}</div>
+                    </div>
+                }
             </div>
         );
     }

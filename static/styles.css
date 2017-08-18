@@ -58,13 +58,22 @@ div.chatOutput {
     color: white;
 }
 
-.debug-history-item-propname {
+.debug-history-scalar-item-propname {
     display: inline-block;
     font-style: italic;
 }
 
-.debug-history-item-propvalue {
+.debug-history-scalar-item-propvalue {
     display: inline-block;
+    font-family: monospace;
+    white-space: pre;
+}
+
+.debug-history-object-item-propname {
+    font-style: italic;
+}
+
+.debug-history-object-item-propvalue {
     font-family: monospace;
     white-space: pre;
 }
