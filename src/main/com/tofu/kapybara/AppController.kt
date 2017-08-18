@@ -9,6 +9,7 @@ import java.util.*
 class AppController(val authorizationService: AuthorizationService) {
     init {
         get("/app") { req, res -> serveApp(req, res) }
+        get("/app/*") { req, res -> serveApp(req, res) }
     }
 
     private fun serveApp(req: Request, res: Response): Any? {
@@ -21,14 +22,14 @@ class AppController(val authorizationService: AuthorizationService) {
     <head>
         <meta charset="UTF-8">
         <title>React App</title>
-        <link rel="stylesheet" href="styles.css?$cacheBuster">
+        <link rel="stylesheet" href="/styles.css?$cacheBuster">
     </head>
     <body>
         <div id="app">
             Hello world
             <a href="/auth/signout">Log Out</a>
         </div>
-        <script src="index.js?$cacheBuster"></script>
+        <script src="/index.js?$cacheBuster"></script>
     </body>
 </html>
 """

@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter, Route, Link, Redirect, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Link, Redirect, Switch } from 'react-router-dom';
 import { Provider, dispatch, connect } from 'react-redux';
 import store from './store';
 
@@ -71,7 +71,7 @@ const SDebugger = connect(
 
 class Kapybara extends React.Component {
     render() {return (
-        <HashRouter>
+        <BrowserRouter basename="/app">
             <div>
                 <Switch>
                     <Route exact path="/" component={connect(
@@ -84,6 +84,7 @@ class Kapybara extends React.Component {
                             createOrganization: (org) => dispatch(organizations.createOrganization(org))
                         })
                     )(Home)} />
+                    <Route exact path="/settings" component={SettingsPanel} />                    
                     <Route path="/:org" component={(x) =>
                         (<SLayout organizationToken={x.match.params.org}>
                             <Route exact path={x.match.url+'/projects'} component={(y) =>
@@ -103,12 +104,11 @@ class Kapybara extends React.Component {
                             } />
                         </SLayout>)
                     } />
-                    <Route path="/settings" component={SettingsPanel} />
                     <Route path='/*' component={NotFound} />
                 </Switch>
                 <SDebugger />
             </div>
-        </HashRouter>
+        </BrowserRouter>
     );}
 }
 
