@@ -1,9 +1,6 @@
-import { createStore, applyMiddleware  } from 'redux';
-import applicationReducer from './ducks/root';
-
 // This middleware will just add the property "async dispatch"
 // http://stackoverflow.com/questions/36730793/dispatch-action-in-reducer
-const asyncDispatchMiddleware = store => next => action => {
+export const asyncDispatchMiddleware = store => next => action => {
     let syncActivityFinished = false;
     let actionQueue = [];
 
@@ -26,10 +23,12 @@ const asyncDispatchMiddleware = store => next => action => {
     flushQueue();
 };
 
-const actionLogMiddleware = store => next => action => {
+export const actionLogMiddleware = store => next => action => {
+    console.log(action);
     next(action);
-}
+};
 
-let store = createStore(applicationReducer, applyMiddleware(actionLogMiddleware, asyncDispatchMiddleware));
-
-export default store;
+export default {
+    asyncDispatchMiddleware,
+    actionLogMiddleware
+};

@@ -1,11 +1,12 @@
 import React from 'react';
 import { BrowserRouter, Route, Link, Redirect, Switch } from 'react-router-dom';
 import { Provider, dispatch, connect } from 'react-redux';
-import store from './store';
+import { createStore, applyMiddleware  } from 'redux';
 
 import * as projects from './ducks/project';
 import * as organizations from './ducks/organization';
-import { getCurrentUser } from './ducks/root';
+import applicationReducer, { getCurrentUser } from './ducks/root';
+import middlewares from './middlewares.js';
 
 import Home from './components/Home.jsx';
 import Projects from './components/Projects.jsx';
@@ -14,6 +15,12 @@ import Chat from './components/Chat.jsx';
 import Layout from './components/Layout.jsx';
 import Debugger from './components/Debugger.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
+
+let store = createStore(
+    applicationReducer,
+    applyMiddleware(
+        middlewares.actionLogMiddleware,
+        middlewares.asyncDispatchMiddleware));
 
 const SProjects = connect(
     (state) => ({
@@ -69,57 +76,45 @@ const SDebugger = connect(
     },
 )(Debugger);
 
-class Kapybara extends React.Component {
-    render() {return (
-        <BrowserRouter basename="/app">
-            <div className="app-container">
-                <Switch>
-                    <Route exact path="/" component={connect(
-                        (state)  => ({
-                            user: state.user,
-                            organizations: state.organizations,
-                        }),
-                        (dispatch) => ({
-                            onLoad: () => dispatch(getCurrentUser()),
-                            createOrganization: (org) => dispatch(organizations.createOrganization(org))
-                        })
-                    )(Home)} />
-                    <Route exact path="/settings" component={SettingsPanel} />
-                    <Route path="/:org" component={(x) =>
-                        (<SLayout organizationToken={x.match.params.org}>
-                            <Route exact path={x.match.url+'/projects'} component={(y) =>
-                                (<SProjects organizationToken={x.match.params.org} />)
-                            } />
-                            <Route path={x.match.url+'/projects/:projectId'} component={(y) =>
-                                (<SProjects organizationToken={x.match.params.org} projectId={y.match.params.projectId} />)
-                            } />
-                            <Route path={x.match.url+'/chat/:channel'} component={(y) =>
-                                (<SChat organizationToken={x.match.params.org} channel={y.match.params.channel} />)
-                            } />
-                        </SLayout>)
-                    } />
-                    <Route path='/*' component={NotFound} />
-                </Switch>
-            </div>
-        </BrowserRouter>
-    );}
-}
-
 const debugEnabled = true;
 
-class App extends React.Component {
-    render() {
-        return (
-            <Provider store={store}>
+const App = () => {
+    return <Provider store={store}>
+        <div className="app-container">
+            <BrowserRouter basename="/app">
                 <div className="app-container">
-                    <Kapybara />
-                    {debugEnabled
-                        ? <SDebugger />
-                        : null}
+                    <Switch>
+                        <Route exact path="/" component={connect(
+                            (state)  => ({
+                                user: state.user,
+                                organizations: state.organizations,
+                            }),
+                            (dispatch) => ({
+                                onLoad: () => dispatch(getCurrentUser()),
+                                createOrganization: (org) => dispatch(organizations.createOrganization(org))
+                            })
+                        )(Home)} />
+                        <Route exact path="/settings" component={SettingsPanel} />
+                        <Route path="/:org" component={(x) =>
+                            (<SLayout organizationToken={x.match.params.org}>
+                                <Route exact path={x.match.url+'/projects'} component={(y) =>
+                                    (<SProjects organizationToken={x.match.params.org} />)
+                                } />
+                                <Route path={x.match.url+'/projects/:projectId'} component={(y) =>
+                                    (<SProjects organizationToken={x.match.params.org} projectId={y.match.params.projectId} />)
+                                } />
+                                <Route path={x.match.url+'/chat/:channel'} component={(y) =>
+                                    (<SChat organizationToken={x.match.params.org} channel={y.match.params.channel} />)
+                                } />
+                            </SLayout>)
+                        } />
+                        <Route path='/*' component={NotFound} />
+                    </Switch>
                 </div>
-            </Provider>
-        );
-    }
-}
+            </BrowserRouter>
+            {debugEnabled ? <SDebugger /> : null}
+        </div>
+    </Provider>
+};
 
 export default App;
