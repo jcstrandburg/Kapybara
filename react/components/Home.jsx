@@ -38,7 +38,9 @@ export default class Home extends Component {
                 <br />
                 <div>Home</div>
                 <ul>
-                    {Object.values(this.props.organizations).map(this.renderOrganization)}
+                    {this.props.user && this.props.user.organizations
+                        ? this.props.user.organizations.map(this.renderOrganization)
+                        : 'loading2...'}
                 </ul>
 
                 <form onSubmit={this.handleSubmit}>
@@ -56,5 +58,10 @@ Home.propTypes = {
     createOrganization: PropTypes.func.isRequired,
     onLoad: PropTypes.func.isRequired,
 
-    organizations: PropTypes.objectOf(PropTypes.object).isRequired,
+    user: PropTypes.shape({
+        id: PropTypes.id,
+        name: PropTypes.string,
+        alias: PropTypes.string,
+        organizations: PropTypes.arrayOf(PropTypes.object)
+    }),
 };

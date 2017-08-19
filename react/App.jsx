@@ -1,12 +1,15 @@
 import React from 'react';
 import { BrowserRouter, Route, Link, Redirect, Switch } from 'react-router-dom';
 import { Provider, dispatch, connect } from 'react-redux';
-import { createStore, applyMiddleware  } from 'redux';
+import { combineReducers, createStore, applyMiddleware  } from 'redux';
 
 import * as projects from './ducks/project';
 import * as organizations from './ducks/organization';
-import applicationReducer, { getCurrentUser } from './ducks/root';
+import * as user from './ducks/user';
+import * as debug from './ducks/debug';
+
 import middlewares from './middlewares.js';
+import appClient from './util/appClient.js';
 
 import Home from './components/Home.jsx';
 import Projects from './components/Projects.jsx';
@@ -16,11 +19,18 @@ import Layout from './components/Layout.jsx';
 import Debugger from './components/Debugger.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 
-let store = createStore(
-    applicationReducer,
+const store = createStore(
+    combineReducers({
+        user: (state, action) => user.default(state, action, appClient),
+        projects: (state, action) => projects.default(state, action, appClient),
+        organizations: (state, action) => organizations.default(state, action, appClient),
+        debug: debug.default
+    }),
     applyMiddleware(
         middlewares.actionLogMiddleware,
-        middlewares.asyncDispatchMiddleware));
+        middlewares.asyncDispatchMiddleware
+    )
+);
 
 const SProjects = connect(
     (state) => ({
@@ -67,11 +77,11 @@ const SLayout = connect(
 
 const SDebugger = connect(
     (state) => {
-        let { actionHistory, ...coreState } = state;
+        let { debug, ...coreState } = state;
 
         return {
             state: coreState,
-            actionHistory
+            actionHistory: debug.actionHistory
         };
     },
 )(Debugger);
@@ -87,10 +97,9 @@ const App = () => {
                         <Route exact path="/" component={connect(
                             (state)  => ({
                                 user: state.user,
-                                organizations: state.organizations,
                             }),
                             (dispatch) => ({
-                                onLoad: () => dispatch(getCurrentUser()),
+                                onLoad: () => dispatch(user.getCurrentUser()),
                                 createOrganization: (org) => dispatch(organizations.createOrganization(org))
                             })
                         )(Home)} />

@@ -57,7 +57,7 @@ export function commentsUpdated(projectId, comments) {
     return { type: COMMENTS_UPDATED, projectId, comments };
 }
 
-export default function reducer(projects = [], action, fetchJson, appClient) {
+export default function reducer(projects = {}, action, appClient) {
     // handle async events
     switch (action.type) {
     case CREATE_ASYNC:
