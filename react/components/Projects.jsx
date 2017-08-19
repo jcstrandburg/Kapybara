@@ -26,15 +26,18 @@ export default class Projects extends React.Component {
         this.props.onCreateProject({ name: projectName, organizationId: this.getOrganizationId(), parentProjectId: this.props.projectId });
     }
 
-    getOrganizationId = () => {
-        return this.props.organizations[this.props.organizationToken].id;
+    getOrganizationId = () => this.props.organizations[this.props.organizationToken] && this.props.organizations[this.props.organizationToken].id;
+
+    getDisplayableProjects = () => {
+        let organizationId = this.getOrganizationId();
+        return Object.values(this.props.projects).filter(proj => proj.parentProjectId == this.props.projectId && proj.organizationId == organizationId);
     }
 
     render() {
         return (
             <div>
                 Projects<br />
-                <ProjectList organizationToken={this.props.organizationToken} projects={Object.values(this.props.projects).filter(proj => proj.parentProjectId == this.props.projectId)} />
+                <ProjectList organizationToken={this.props.organizationToken} projects={this.getDisplayableProjects()} />
                 <CreateProject createProject={this.createProject}/>
             </div>
         );
