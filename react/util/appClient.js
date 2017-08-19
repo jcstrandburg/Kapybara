@@ -26,7 +26,7 @@ const defaultHeaders = new Headers({
 
 export default {
     urlEncode: (params) => {
-        let notNullParams = Object.keys(params).filter(k => params[k] !== null);
+        let notNullParams = Object.keys(params).filter(k => params[k] !== null && params[k] !== undefined);
         if (notNullParams.length) {
             return '?' + (Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&'));
         }

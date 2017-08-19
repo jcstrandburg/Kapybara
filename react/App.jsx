@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter, Route, Link, Redirect, Switch } from 'react-router-dom';
 import { Provider, dispatch, connect } from 'react-redux';
 import { combineReducers, createStore, applyMiddleware  } from 'redux';
+import { ConnectedRouter, routerReducer, routerMiddleware } from 'react-router-redux';
+import createHistory from 'history/createBrowserHistory';
 
 import * as projects from './ducks/project';
 import * as organizations from './ducks/organization';
@@ -19,6 +21,7 @@ import Layout from './components/Layout.jsx';
 import Debugger from './components/Debugger.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 
+const history = createHistory();
 const store = createStore(
     combineReducers({
         user: (state, action) => user.default(state, action, appClient),
