@@ -21,15 +21,19 @@ import Layout from './components/Layout.jsx';
 import Debugger from './components/Debugger.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 
-const history = createHistory();
+const history = createHistory({
+    basename: '/app',
+});
 const store = createStore(
     combineReducers({
         user: (state, action) => user.default(state, action, appClient),
         projects: (state, action) => projects.default(state, action, appClient),
         organizations: (state, action) => organizations.default(state, action, appClient),
-        debug: debug.default
+        debug: debug.default,
+        routing: routerReducer,
     }),
     applyMiddleware(
+        routerMiddleware(history),
         middlewares.actionLogMiddleware,
         middlewares.asyncDispatchMiddleware
     )
@@ -94,7 +98,7 @@ const debugEnabled = true;
 const App = () => {
     return <Provider store={store}>
         <div className="app-container">
-            <BrowserRouter basename="/app">
+            <ConnectedRouter history={history}>
                 <div className="app-container">
                     <Switch>
                         <Route exact path="/" component={connect(
@@ -123,7 +127,7 @@ const App = () => {
                         <Route path='/*' component={NotFound} />
                     </Switch>
                 </div>
-            </BrowserRouter>
+            </ConnectedRouter>
             {debugEnabled ? <SDebugger /> : null}
         </div>
     </Provider>
