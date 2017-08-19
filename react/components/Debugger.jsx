@@ -45,7 +45,7 @@ const style = {
     position: 'absolute',
     top: '10px',
     right: '10px',
-    height: '100%',
+    height: '90%',
     overflow: 'auto',
 };
 
@@ -71,7 +71,7 @@ export default class Debugger extends React.Component {
                             <div>
                                 <button onClick={() => this.setState({ activePanel: 1 })}>State</button>
                                 <button onClick={() => this.setState({ activePanel: 2 })}>History</button>
-                                <button onClick={this.toggle}>Hide</button>
+                                <button onClick={this.toggle}>🐛</button>
                             </div>
                             <div className="debug-content">
                                 {this.state.activePanel == 1
@@ -80,7 +80,7 @@ export default class Debugger extends React.Component {
                                 }
                             </div>
                         </div>)
-                    : <div onClick={this.toggle}>🐛</div>}
+                    : <button onClick={this.toggle}>🐛</button>}
             </div>
         );
     }
