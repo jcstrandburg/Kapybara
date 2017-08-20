@@ -1,8 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import Modal from 'react-modal';
 
 export default class Projects extends React.Component {
+    state = {
+        isNewModalOpen: false
+    };
+
     componentWillMount() {
         let { organizationToken, projectId } = this.props;
 
@@ -24,7 +29,12 @@ export default class Projects extends React.Component {
 
     createProject = (projectName) => {
         this.props.onCreateProject({ name: projectName, organizationId: this.getOrganizationId(), parentProjectId: this.props.projectId });
+        this.closeNewModal();
     }
+
+    closeNewModal = () => this.setState({ isNewModalOpen: false });
+
+    openNewModal = () => this.setState({ isNewModalOpen: true });
 
     getOrganizationId = () => this.props.organizations[this.props.organizationToken] && this.props.organizations[this.props.organizationToken].id;
 
@@ -36,9 +46,11 @@ export default class Projects extends React.Component {
     render() {
         return (
             <div>
-                Projects<br />
+                Projects - <button onClick={this.openNewModal}>New</button><br />
                 <ProjectList organizationToken={this.props.organizationToken} projects={this.getDisplayableProjects()} />
-                <CreateProject createProject={this.createProject}/>
+                <Modal isOpen={ this.state.isNewModalOpen } contentLabel="Create New Project">
+                    <CreateProject createProject={this.createProject} cancel={this.closeNewModal} />
+                </Modal>
             </div>
         );
     }
@@ -69,8 +81,10 @@ class CreateProject extends React.Component {
         return (
             <div>
                 <form onSubmit={this.submitForm}>
-                    <input type="text" ref={(input) => this.input = input}></input>
-                    <input type="submit" value="Create"></input>
+                    <h1>Create New Project</h1>
+                    Project Name: <input type="text" ref={(input) => this.input = input} /><br />
+                    <input type="submit" value="Create" />
+                    <input type="submit" value="Cancel" />
                 </form>
             </div>
         );
@@ -78,6 +92,7 @@ class CreateProject extends React.Component {
 }
 
 CreateProject.propTypes = {
+    cancel: PropTypes.func.isRequired,
     createProject: PropTypes.func.isRequired,
 };
 
