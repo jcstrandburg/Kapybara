@@ -44,6 +44,18 @@ export default {
         else
             return fetch(apiBase+route, fetchOptions).then(wrapResponse);
     },
+    getAsync: (route, handler = null) => {
+        let fetchOptions = {
+            credentials: "same-origin",
+            method: 'GET',
+            headers: defaultHeaders
+        }
+
+        if (handler !== null)
+            return fetch(apiBase+route, fetchOptions).then(wrapResponse).then(wrappedResponse => wrappedResponse.handle(handler));
+        else
+            return fetch(apiBase+route, fetchOptions).then(wrapResponse);
+    },
     post: (route, body, handler = null) => {
         let fetchOptions = {
             credentials: "same-origin",

@@ -8,6 +8,7 @@ import createHistory from 'history/createBrowserHistory';
 import * as projects from './ducks/project';
 import * as organizations from './ducks/organization';
 import * as user from './ducks/user';
+import * as comments from './ducks/comments';
 import * as debug from './ducks/debug';
 
 import middlewares from './middlewares.js';
@@ -21,6 +22,19 @@ import Layout from './components/Layout.jsx';
 import Debugger from './components/Debugger.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 
+const lazyLoader = {
+    requestedKeys: {},
+
+    startLazyLoad: (key, dispatch) => {
+        if (cachedRequests[key])
+            return;
+
+        console.log('lazy loading user with key '+key);
+        requestedKeys[key] = true;
+        dispatch(users.getUser(key));
+    }
+}
+
 const history = createHistory({
     basename: '/app',
 });
@@ -29,12 +43,13 @@ const store = createStore(
         user: (state, action) => user.default(state, action, appClient),
         projects: (state, action) => projects.default(state, action, appClient),
         organizations: (state, action) => organizations.default(state, action, appClient),
+        comments: (state, action) => comments.default(state, action, appClient),
         debug: debug.default,
         routing: routerReducer,
     }),
     applyMiddleware(
         routerMiddleware(history),
-        middlewares.actionLogMiddleware,
+        //middlewares.actionLogMiddleware,
         middlewares.asyncDispatchMiddleware
     )
 );
@@ -42,7 +57,8 @@ const store = createStore(
 const SProjects = connect(
     (state) => ({
         organizations: state.organizations,
-        projects: state.projects
+        projects: state.projects,
+        commentsByProjectId: state.comments.byProjectId,
     }),
     (dispatch) => ({
         onLoad: (organizationToken) => {
@@ -53,12 +69,27 @@ const SProjects = connect(
             dispatch(projects.createProject(project));
         },
         getProjectData: (projectId) => {
-            dispatch(projects.getProjectComments(projectId));
+            dispatch(comments.getProjectComments(projectId));
         },
         getChildrenProjects: (organizationToken, parentProjectId) => {
             dispatch(projects.getOrganizationProjects(organizationToken, parentProjectId));
+        },
+        postComment: (projectId, content) => {
+            dispatch(comments.postProjectComment(projectId, content))
         }
     }),
+    (stateProps, dispatchProps, parentProps) => {
+        let { commentsByProjectId, ...stateProps2 } = stateProps;
+
+        let x = {
+            ...stateProps2,
+            ...dispatchProps,
+            ...parentProps,
+            comments: (parentProps.projectId && commentsByProjectId[parentProps.projectId]) || []
+        };
+        console.log(x);
+        return x;
+    }
 )(Projects);
 
 const SChat = connect(

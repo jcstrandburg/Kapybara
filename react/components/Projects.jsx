@@ -48,6 +48,12 @@ export default class Projects extends React.Component {
             <div>
                 Projects - <button onClick={this.openNewModal}>New</button><br />
                 <ProjectList organizationToken={this.props.organizationToken} projects={this.getDisplayableProjects()} />
+                {this.props.projectId && this.props.projects[this.props.projectId]
+                    ? <ProjectDetails
+                        comments={this.props.comments}
+                        project={this.props.projects[this.props.projectId]}
+                        postComment={(content) => this.props.postComment(this.props.projectId, content)} />
+                    : null}
                 <Modal isOpen={ this.state.isNewModalOpen } contentLabel="Create New Project">
                     <CreateProject createProject={this.createProject} cancel={this.closeNewModal} />
                 </Modal>
@@ -60,14 +66,51 @@ Projects.propTypes = {
     organizationToken: PropTypes.string.isRequired,
     organizations: PropTypes.objectOf(PropTypes.object).isRequired,
     projectId: PropTypes.string,
+    comments: PropTypes.arrayOf(PropTypes.object),
 
     getProjectData: PropTypes.func.isRequired,
     getChildrenProjects: PropTypes.func.isRequired,
     onCreateProject: PropTypes.func.isRequired,
+    postComment: PropTypes.func.isRequired,
 };
 
 Projects.defaultProps = {
     projectId: null,
+};
+
+class ProjectDetails extends React.Component {
+    submitComment = (event) => {
+        this.props.postComment(this.input.value);
+        this.input.value = "";
+    }
+
+    renderComment = (comment) => (
+        <div key={comment.id}>
+            Author: {comment.userId}<br />
+            When: {comment.createdTime}<br />
+            Comment: {comment.content}<br />
+        </div>
+    )
+
+    render() {
+        return (
+            <div>
+                <h2>Discussion</h2>
+                {this.props.comments.map(this.renderComment)}
+
+                <textarea ref={(input) => this.input = input} ></textarea>
+                <button onClick={this.submitComment}>Submit</button>
+            </div>
+        );
+    }
+}
+
+ProjectDetails.propTypes = {
+    project: PropTypes.object.isRequired,
+    comments: PropTypes.arrayOf(PropTypes.object).isRequired,
+    authors: PropTypes.objectOf(PropTypes.object),
+
+    postComment: PropTypes.func.isRequired,
 };
 
 class CreateProject extends React.Component {

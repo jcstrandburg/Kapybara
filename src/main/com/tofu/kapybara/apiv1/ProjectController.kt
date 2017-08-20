@@ -90,12 +90,9 @@ class ProjectController(
             return halt(404)
 
         val createDto = gson.fromJson(req.body(), DiscussionCommentCreateDto::class.java)
-        if (createDto.userId != user.id)
-            return halt(404)
-
         val message = projectRepository.addDiscussionMessage(
             projectId,
-            DiscussionMessageCreate(createDto.userId, createDto.content))
+            DiscussionMessageCreate(user.id, createDto.content))
 
         return DiscussionCommentDto(
                 id=message.id,

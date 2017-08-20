@@ -18,7 +18,7 @@ data class ProjectSummaryDto(val id: Int, val name: String, val organizationId: 
 data class ProjectCreateDto(val project: ProjectSummaryDto): Dto()
 data class ProjectCollectionDto(val projects: List<ProjectSummaryDto>): Dto()
 
-data class DiscussionCommentCreateDto(val userId: Int, val content: String): Dto()
+data class DiscussionCommentCreateDto(val content: String): Dto()
 data class DiscussionCommentDto(val id: Int, val userId: Int, val content: String, val createdTime: OffsetDateTime): Dto()
 data class DiscussionCommentCollectionDto(val comments: List<DiscussionCommentDto>): Dto()
 
