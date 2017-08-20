@@ -24,7 +24,7 @@ class ProjectController(
         get(Routes.GET_PROJECT) { req, _ -> getProject(req) }
         get(Routes.GET_PROJECTS_FOR_ORGANIZATION) { req, _ -> getProjectsForOrganization(req) }
 
-        post(Routes.CREATE_PROJECT_COMMENT) { req, _ -> createProjectComment(req) }
+        post(Routes.CREATE_PROJECT_COMMENT) { req, res -> createProjectComment(req, res) }
         get(Routes.GET_PROJECT_COMMENTS) { req, _ -> getProjectComments(req) }
     }
 
@@ -79,7 +79,7 @@ class ProjectController(
             .toJson()
     }
 
-    private fun createProjectComment(req: Request): Any? {
+    private fun createProjectComment(req: Request, res: Response): Any? {
         val user = authorizationService.getLoggedInUser(req) ?: return halt(401)
         val projectId = req.params("projectId").toIntOrNull() ?: return halt(400)
         val project = projectRepository.getProject(projectId) ?: return halt(404)
@@ -94,6 +94,7 @@ class ProjectController(
             projectId,
             DiscussionMessageCreate(user.id, createDto.content))
 
+        res.status(201)
         return DiscussionCommentDto(
                 id=message.id,
                 userId=message.userId,

@@ -3,13 +3,26 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
 
+import toDict from '../util/toDict.js';
+import ActionButton from './common/ActionButton.jsx';
+
+const defaultAuthor = {
+    name: 'loading...',
+    alias: 'loading...',
+}
+
 export default class Projects extends React.Component {
     state = {
-        isNewModalOpen: false
+        isNewModalOpen: false,
+        authors: {},
     };
 
     componentWillMount() {
-        let { organizationToken, projectId } = this.props;
+        let { comments, userRepository, lazyLoadUser, organizationToken, projectId } = this.props;
+
+        this.setState({
+                authors: this.getAuthors(comments, userRepository, lazyLoadUser),
+            });
 
         this.props.onLoad(organizationToken);
         if (projectId) {
@@ -19,7 +32,11 @@ export default class Projects extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        let { organizationToken, projectId } = nextProps;
+        let { comments, userRepository, lazyLoadUser, organizationToken, projectId } = nextProps;
+
+        this.setState({
+                authors: this.getAuthors(comments, userRepository, lazyLoadUser),
+            });
 
         if (projectId && projectId != this.props.projectId) {
             this.props.getProjectData(projectId);
@@ -43,13 +60,20 @@ export default class Projects extends React.Component {
         return Object.values(this.props.projects).filter(proj => proj.parentProjectId == this.props.projectId && proj.organizationId == organizationId);
     }
 
+    getAuthors = (comments, userRepository, lazyLoadUser) => {
+        return toDict([...new Set(comments.map(it => it.userId))]
+            .map(id => userRepository.getOrLazyLoad(id, lazyLoadUser) || defaultAuthor),
+            it => it.id);
+    }
+
     render() {
         return (
             <div>
-                Projects - <button onClick={this.openNewModal}>New</button><br />
+                Projects - <ActionButton onClick={this.openNewModal} text="New" /><br />
                 <ProjectList organizationToken={this.props.organizationToken} projects={this.getDisplayableProjects()} />
                 {this.props.projectId && this.props.projects[this.props.projectId]
                     ? <ProjectDetails
+                        authors={this.state.authors}
                         comments={this.props.comments}
                         project={this.props.projects[this.props.projectId]}
                         postComment={(content) => this.props.postComment(this.props.projectId, content)} />
@@ -67,11 +91,13 @@ Projects.propTypes = {
     organizations: PropTypes.objectOf(PropTypes.object).isRequired,
     projectId: PropTypes.string,
     comments: PropTypes.arrayOf(PropTypes.object),
+    userRepository: PropTypes.object,
 
     getProjectData: PropTypes.func.isRequired,
     getChildrenProjects: PropTypes.func.isRequired,
     onCreateProject: PropTypes.func.isRequired,
     postComment: PropTypes.func.isRequired,
+    lazyLoadUser: PropTypes.func.isRequired,
 };
 
 Projects.defaultProps = {
@@ -84,13 +110,14 @@ class ProjectDetails extends React.Component {
         this.input.value = "";
     }
 
-    renderComment = (comment) => (
-        <div key={comment.id}>
-            Author: {comment.userId}<br />
+    renderComment = (comment) => {
+        let author = this.props.authors[comment.userId] || defaultAuthor;
+        return (<div key={comment.id}>
+            Author: {author.alias || author.name}<br />
             When: {comment.createdTime}<br />
             Comment: {comment.content}<br />
-        </div>
-    )
+        </div>)
+    };
 
     render() {
         return (
@@ -108,7 +135,7 @@ class ProjectDetails extends React.Component {
 ProjectDetails.propTypes = {
     project: PropTypes.object.isRequired,
     comments: PropTypes.arrayOf(PropTypes.object).isRequired,
-    authors: PropTypes.objectOf(PropTypes.object),
+    authors: PropTypes.objectOf(PropTypes.object).isRequired,
 
     postComment: PropTypes.func.isRequired,
 };

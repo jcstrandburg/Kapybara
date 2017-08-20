@@ -8,11 +8,13 @@ import createHistory from 'history/createBrowserHistory';
 import * as projects from './ducks/project';
 import * as organizations from './ducks/organization';
 import * as user from './ducks/user';
+import * as users from './ducks/users';
 import * as comments from './ducks/comments';
 import * as debug from './ducks/debug';
 
 import middlewares from './middlewares.js';
 import appClient from './util/appClient.js';
+import toDict from './util/toDict';
 
 import Home from './components/Home.jsx';
 import Projects from './components/Projects.jsx';
@@ -22,18 +24,40 @@ import Layout from './components/Layout.jsx';
 import Debugger from './components/Debugger.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 
-const lazyLoader = {
-    requestedKeys: {},
+class LazyLoaderCache {
+    keysLoaded = {};
 
-    startLazyLoad: (key, dispatch) => {
-        if (cachedRequests[key])
+    startLazyLoad(key, load) {
+        if (this.keysLoaded[key])
             return;
 
-        console.log('lazy loading user with key '+key);
-        requestedKeys[key] = true;
-        dispatch(users.getUser(key));
+        console.log('Lazy loading key '+key);
+        this.keysLoaded[key] = true;
+        load();
+        console.log('Called load '+key);        
     }
 }
+
+class UserRepository {
+    constructor(users, cache) {
+        this.users = users;
+        this.cache = cache;
+    }
+
+    getOrLazyLoad(id, lazyLoad) {
+        if (this.users[id])
+            return this.users[id];
+
+        this.cache.startLazyLoad(id, () => lazyLoad(id));
+        return {
+            id,
+            name: 'loading...',
+            alias: 'loading...'
+        };
+    }
+}
+
+const userLazyLoaderCache = new LazyLoaderCache();
 
 const history = createHistory({
     basename: '/app',
@@ -41,6 +65,7 @@ const history = createHistory({
 const store = createStore(
     combineReducers({
         user: (state, action) => user.default(state, action, appClient),
+        users: (state, action) => users.default(state, action, appClient),
         projects: (state, action) => projects.default(state, action, appClient),
         organizations: (state, action) => organizations.default(state, action, appClient),
         comments: (state, action) => comments.default(state, action, appClient),
@@ -55,11 +80,16 @@ const store = createStore(
 );
 
 const SProjects = connect(
-    (state) => ({
-        organizations: state.organizations,
-        projects: state.projects,
-        commentsByProjectId: state.comments.byProjectId,
-    }),
+    (state, ownProps) => {
+        return {
+            organizations: state.organizations,
+            projects: state.projects,
+            projectId: ownProps.projectId,
+            users: state.users,
+            comments: (ownProps.projectId && state.comments.byProjectId[ownProps.projectId]) || [],
+            userRepository: new UserRepository(state.users, userLazyLoaderCache),
+        };
+    },
     (dispatch) => ({
         onLoad: (organizationToken) => {
             dispatch(organizations.getOrganization(organizationToken));
@@ -75,21 +105,12 @@ const SProjects = connect(
             dispatch(projects.getOrganizationProjects(organizationToken, parentProjectId));
         },
         postComment: (projectId, content) => {
-            dispatch(comments.postProjectComment(projectId, content))
+            dispatch(comments.postProjectComment(projectId, content));
+        },
+        lazyLoadUser: (id) => {
+            dispatch(users.getUser(id));
         }
     }),
-    (stateProps, dispatchProps, parentProps) => {
-        let { commentsByProjectId, ...stateProps2 } = stateProps;
-
-        let x = {
-            ...stateProps2,
-            ...dispatchProps,
-            ...parentProps,
-            comments: (parentProps.projectId && commentsByProjectId[parentProps.projectId]) || []
-        };
-        console.log(x);
-        return x;
-    }
 )(Projects);
 
 const SChat = connect(

@@ -1,4 +1,3 @@
-import appClient from '../util/appClient';
 import * as httpCodes from '../util/appClient';
 
 const GET_CURRENT_USER_ASYNC = 'USER/GET_CURRENT_USER_ASYNC';

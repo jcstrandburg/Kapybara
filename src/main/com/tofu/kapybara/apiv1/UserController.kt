@@ -43,9 +43,9 @@ class UserController(
 
     private fun getUser(req: Request, res: Response): Any? {
         authorizationService.getLoggedInUser(req) ?: return halt(401)
-        val username = req.queryParams(":username")
-        val user = userRepository.getUser(username) ?: return halt(404)
+        val userId = req.params(":userId")?.toIntOrNull() ?: return halt(400)
 
+        val user = userRepository.getUser(userId) ?: return halt(404)
         return UserDto(
                 id=user.id,
                 name=user.name,

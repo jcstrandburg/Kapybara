@@ -1,20 +1,32 @@
-import appClient from '../util/appClient';
 import * as httpCodes from '../util/appClient';
 
-const GET_CURRENT_USER_ASYNC = 'USER/GET_CURRENT_USER_ASYNC';
-const GET_USER_ASYNC = 'USER/SET_CURRENT_USER';
+const GET_ASYNC = 'USERS/GET_ASYNC';
 
-const lazyLoader = {
-    cachedRequests: {},
+const UPDATED = 'USERS/UPDATED';
 
-    startLazyLoad: (key, appClient) => {
-        if (cachedRequests[key])
-            return;
+export function getUser(userId) {
+    return { type: GET_ASYNC, userId };
+}
 
-        cachedRequests[key] = appClient
-            .getAsync('users/'+key)
-            .then(result => {
-                
-            });
+export function userUpdated(user) {
+    return { type: UPDATED, user };
+}
+
+export default function reducer(users = {}, action, appClient) {
+    // handle async events
+    switch (action.type) {
+    case GET_ASYNC:
+        appClient.get('users/'+action.userId, {
+            [httpCodes.OK]: result => action.asyncDispatch(userUpdated(result))
+        });
+        break;
+    }
+
+    switch (action.type) {
+    case UPDATED:
+        console.log(action);
+        return Object.assign({}, users, { [action.user.id]: action.user });
+    default:
+        return users;
     }
 }

@@ -50,7 +50,7 @@ export default function reducer(comments = initialState, action, appClient) {
                 content: action.content
             },
             {
-                [httpCodes.OK]: result => action.asyncDispatch(getProjectComments(action.projectId))
+                [httpCodes.CREATED]: result => action.asyncDispatch(getProjectComments(action.projectId))
             });
         break;
     }
