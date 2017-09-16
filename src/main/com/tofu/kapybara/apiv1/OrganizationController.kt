@@ -9,13 +9,13 @@ import com.tofu.kapybara.data.IUserRepository
 import com.tofu.kapybara.data.models.Organization
 
 import com.tofu.kapybara.data.models.OrganizationCreate
-import com.tofu.kapybara.services.AuthorizationService
+import com.tofu.kapybara.services.AuthenticationService
 import spark.Request
 import spark.Response
 import spark.Spark.*
 
 class OrganizationController(
-    private val authorizationService: AuthorizationService,
+    private val authenticationService: AuthenticationService,
     private val organizationRepository: IOrganizationRepository,
     private val userRepository: IUserRepository) {
 
@@ -32,7 +32,7 @@ class OrganizationController(
     }
 
     private fun createOrganization(req: Request, res: Response): Any? {
-        val user = authorizationService.getLoggedInUser(req) ?: return halt(401)
+        val user = authenticationService.getLoggedInUser(req) ?: return halt(401)
 
         val organizationCreate = gson.fromJson(req.body(), OrganizationCreateDto::class.java)
         val organization = OrganizationCreate(
@@ -52,7 +52,7 @@ class OrganizationController(
     }
 
     private fun getOrganization(req: Request, res: Response): Any? {
-        authorizationService.getLoggedInUser(req) ?: return halt(401)
+        authenticationService.getLoggedInUser(req) ?: return halt(401)
 
         val token = req.params("orgToken")
         val org = organizationRepository.getOrganization(token) ?: return halt(404)
@@ -61,7 +61,7 @@ class OrganizationController(
     }
 
     private fun getCurrentUserOrganizations(req: Request, res: Response): Any? {
-        val user = authorizationService.getLoggedInUser(req) ?: return halt(401)
+        val user = authenticationService.getLoggedInUser(req) ?: return halt(401)
 
         val orgs = organizationRepository.getOrganizationsForUser(user.id)
 

@@ -5,16 +5,16 @@ import com.tofu.kapybara.apiv1.dtos.OrganizationSummaryDto
 import com.tofu.kapybara.apiv1.dtos.UserDto
 import com.tofu.kapybara.data.IOrganizationRepository
 import com.tofu.kapybara.data.IUserRepository
-import com.tofu.kapybara.services.AuthorizationService
+import com.tofu.kapybara.services.AuthenticationService
 import spark.Request
 import spark.Response
 import spark.Spark.get
 import spark.Spark.halt
 
 class UserController(
-        private val authorizationService: AuthorizationService,
-        private val userRepository: IUserRepository,
-        private val organizationRepository: IOrganizationRepository) {
+    private val authenticationService: AuthenticationService,
+    private val userRepository: IUserRepository,
+    private val organizationRepository: IOrganizationRepository) {
 
     init {
         get(Routes.GET_CURRENT_USER) { req, res ->
@@ -26,7 +26,7 @@ class UserController(
     }
 
     private fun  getCurrentUser(req: Request, res: Response): Any? {
-        val user = authorizationService.getLoggedInUser(req) ?: return halt(401)
+        val user = authenticationService.getLoggedInUser(req) ?: return halt(401)
         val organizations = organizationRepository.getOrganizationsForUser(user.id)
 
         return CurrentUserDto(
@@ -42,7 +42,7 @@ class UserController(
     }
 
     private fun getUser(req: Request, res: Response): Any? {
-        authorizationService.getLoggedInUser(req) ?: return halt(401)
+        authenticationService.getLoggedInUser(req) ?: return halt(401)
         val userId = req.params(":userId")?.toIntOrNull() ?: return halt(400)
 
         val user = userRepository.getUser(userId) ?: return halt(404)

@@ -7,14 +7,14 @@ import com.tofu.kapybara.data.IProjectRepository
 import com.tofu.kapybara.data.IUserRepository
 import com.tofu.kapybara.data.models.DiscussionMessageCreate
 import com.tofu.kapybara.data.models.ProjectCreate
-import com.tofu.kapybara.services.AuthorizationService
+import com.tofu.kapybara.services.AuthenticationService
 import spark.Request
 import spark.Response
 import spark.Spark.*
 import sun.plugin.dom.exception.InvalidStateException
 
 class ProjectController(
-    val authorizationService: AuthorizationService,
+    val authenticationService: AuthenticationService,
     val projectRepository: IProjectRepository,
     val userRepository: IUserRepository,
     val organizationRepository: IOrganizationRepository) {
@@ -29,7 +29,7 @@ class ProjectController(
     }
 
     private fun createProject(req: Request, res: Response): Any? {
-        val user = authorizationService.getLoggedInUser(req) ?: return halt(401)
+        val user = authenticationService.getLoggedInUser(req) ?: return halt(401)
 
         val createDto = gson.fromJson(req.body(), ProjectCreateDto::class.java)
         val project = ProjectCreate(
@@ -52,7 +52,7 @@ class ProjectController(
     }
 
     private fun getProject(req: Request): Any? {
-        authorizationService.getLoggedInUser(req) ?: return halt(401)
+        authenticationService.getLoggedInUser(req) ?: return halt(401)
 
         val projectId = req.params("projectId").toIntOrNull() ?: return halt(400)
         val project = projectRepository.getProject(projectId) ?: return halt(404)
@@ -66,7 +66,7 @@ class ProjectController(
     }
 
     private fun getProjectsForOrganization(req: Request): Any? {
-        authorizationService.getLoggedInUser(req) ?: return halt(401)
+        authenticationService.getLoggedInUser(req) ?: return halt(401)
         val orgToken = req.params("orgToken") ?: return halt(400)
         val parentProjectId = req.queryParams("parent")?.toIntOrNull()
         val organization = organizationRepository.getOrganization(orgToken) ?: return halt(404)
@@ -80,7 +80,7 @@ class ProjectController(
     }
 
     private fun createProjectComment(req: Request, res: Response): Any? {
-        val user = authorizationService.getLoggedInUser(req) ?: return halt(401)
+        val user = authenticationService.getLoggedInUser(req) ?: return halt(401)
         val projectId = req.params("projectId").toIntOrNull() ?: return halt(400)
         val project = projectRepository.getProject(projectId) ?: return halt(404)
         val organization = organizationRepository.getOrganization(project.organizationId)
@@ -104,7 +104,7 @@ class ProjectController(
     }
 
     private fun getProjectComments(req: Request): Any? {
-        val user = authorizationService.getLoggedInUser(req) ?: return halt(401)
+        val user = authenticationService.getLoggedInUser(req) ?: return halt(401)
         val projectId = req.params("projectId").toIntOrNull() ?: return halt(400)
         val project = projectRepository.getProject(projectId) ?: return halt(404)
         val organization = organizationRepository.getOrganization(project.organizationId)

@@ -1,13 +1,13 @@
 package com.tofu.kapybara
 
-import com.tofu.kapybara.services.AuthorizationService
+import com.tofu.kapybara.services.AuthenticationService
 import com.tofu.kapybara.util.splitQuery
 import spark.Request
 import spark.Response
 import spark.Spark.get
 import spark.Spark.post
 
-class AuthorizationController(val authorizationService: AuthorizationService) {
+class AuthenticationController(val authenticationService: AuthenticationService) {
 
     init{
         get("/auth/signin") { req, res -> signInForm(req, res) }
@@ -16,7 +16,7 @@ class AuthorizationController(val authorizationService: AuthorizationService) {
     }
 
     private fun signInForm(req: Request, res: Response): Any? {
-        val user = authorizationService.getLoggedInUser(req)
+        val user = authenticationService.getLoggedInUser(req)
         if (user != null)
             return res.redirect("/app")
 
@@ -48,7 +48,7 @@ class AuthorizationController(val authorizationService: AuthorizationService) {
 
     private fun doSignIn(req: Request, res: Response): Any? {
         val formData = splitQuery(req.body())
-        val authenticatedUser = authorizationService.logInUser(formData["username"]!!, formData["password"]!!, res)
+        val authenticatedUser = authenticationService.logInUser(formData["username"]!!, formData["password"]!!, res)
 
         if (authenticatedUser != null) {
             return res.redirect("/app")
@@ -59,7 +59,7 @@ class AuthorizationController(val authorizationService: AuthorizationService) {
     }
 
     private fun logOut(req: Request, res: Response): Any? {
-        authorizationService.logOutUser(res)
+        authenticationService.logOutUser(res)
         return res.redirect("/auth/signin")
     }
 }

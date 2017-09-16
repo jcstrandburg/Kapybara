@@ -7,7 +7,7 @@ import spark.Request
 import spark.Response
 import java.util.*
 
-class AthenticationService(val userRepository: IUserRepository) {
+class AuthenticationService(val userRepository: IUserRepository) {
     /**
      * Gets the currently authenticated user via cookies
      */
@@ -25,10 +25,10 @@ class AthenticationService(val userRepository: IUserRepository) {
         val user = userRepository.getUser(name) ?: return null
 
         if (BCrypt.checkpw(plainPassword, user.password)) {
-            // todo: use setcookie method
             val authenticatedUser = userRepository.setUserAuthToken(user.id, UUID.randomUUID().toString())
-            response.cookie("/", "username", authenticatedUser.name, -1, false, false)
-            response.cookie("/", "authToken", authenticatedUser.authToken, -1, false, false)
+
+            setCookie(response, "username", authenticatedUser.name)
+            setCookie(response, "authToken", authenticatedUser.authToken)
 
             return authenticatedUser
         }

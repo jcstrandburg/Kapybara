@@ -15,14 +15,14 @@ fun main(args: Array<String>) {
     val userRepository = MysqlUserRepository(sql2o)
     val organizationRepository = MysqlOrganizationRepository(sql2o)
     val projectRepository = MysqlProjectRepository(sql2o, discussionContextService)
-    val authorizationService = AuthorizationService(userRepository)
+    val authorizationService = AuthenticationService(userRepository)
 
     port(8080)
     staticFiles.externalLocation(config.staticFileLocation)
     init()
 
     AppController(authorizationService)
-    AuthorizationController(authorizationService)
+    AuthenticationController(authorizationService)
     UserController(authorizationService, userRepository, organizationRepository)
     OrganizationController(authorizationService, organizationRepository, userRepository)
     ProjectController(authorizationService, projectRepository, userRepository, organizationRepository)

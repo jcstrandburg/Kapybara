@@ -1,19 +1,19 @@
 package com.tofu.kapybara
 
-import com.tofu.kapybara.services.AuthorizationService
+import com.tofu.kapybara.services.AuthenticationService
 import spark.Request
 import spark.Response
 import spark.Spark.get
 import java.util.*
 
-class AppController(val authorizationService: AuthorizationService) {
+class AppController(val authenticationService: AuthenticationService) {
     init {
         get("/app") { req, res -> serveApp(req, res) }
         get("/app/*") { req, res -> serveApp(req, res) }
     }
 
     private fun serveApp(req: Request, res: Response): Any? {
-        authorizationService.getLoggedInUser(req) ?: return res.redirect("/auth/signin")
+        authenticationService.getLoggedInUser(req) ?: return res.redirect("/auth/signin")
 
         val cacheBuster = UUID.randomUUID()
         return """
