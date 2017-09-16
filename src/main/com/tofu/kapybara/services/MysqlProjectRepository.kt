@@ -13,18 +13,6 @@ import sun.plugin.dom.exception.InvalidStateException
 import java.math.BigInteger
 import java.time.OffsetDateTime
 
-private fun DbProject.map(): Project {
-    return Project(this.id, this.name, this.organizationId, this.parentProjectId)
-}
-
-private fun DbDiscussionMessage.map(): DiscussionMessage {
-    return DiscussionMessage(
-        id=this.id,
-        userId=this.userId,
-        content=this.content,
-        createdTime=this.createdTime)
-}
-
 class MysqlProjectRepository(
     val sql2o: Sql2o,
     val discussionContextService: MysqlDiscussionContextService
@@ -137,6 +125,20 @@ WHERE id=:discussionMessageId
             query.addParameter("discussionMessageId", discussionMessageId)
                 .executeAndFetch(DbDiscussionMessage::class.java)
                 .single()
+        }
+    }
+
+    companion object {
+        private fun DbProject.map(): Project {
+            return Project(this.id, this.name, this.organizationId, this.parentProjectId)
+        }
+
+        private fun DbDiscussionMessage.map(): DiscussionMessage {
+            return DiscussionMessage(
+                id=this.id,
+                userId=this.userId,
+                content=this.content,
+                createdTime=this.createdTime)
         }
     }
 }

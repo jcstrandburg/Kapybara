@@ -8,10 +8,6 @@ import com.tofu.kapybara.util.dbFields
 import org.sql2o.Sql2o
 import java.math.BigInteger
 
-private fun DbUser.toUser(): User {
-    return User(this.id, this.username, this.password, this.authToken ?: "", this.alias, this.email)
-}
-
 class MysqlUserRepository(val sql2o: Sql2o): IUserRepository {
 
     override fun createUser(user: UserCreate): User {
@@ -149,5 +145,11 @@ WHERE
         }
 
         return dbUsers.map {it.toUser()}
+    }
+
+    companion object {
+        private fun DbUser.toUser(): User {
+            return User(this.id, this.username, this.password, this.authToken ?: "", this.alias, this.email)
+        }
     }
 }

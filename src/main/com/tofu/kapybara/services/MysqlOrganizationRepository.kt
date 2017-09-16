@@ -8,10 +8,6 @@ import com.tofu.kapybara.util.dbFields
 import org.sql2o.Sql2o
 import java.math.BigInteger
 
-private fun DbOrganization.toOrganization(): Organization {
-    return Organization(this.id, this.name, this.token)
-}
-
 class MysqlOrganizationRepository(private val sql2o: Sql2o) : IOrganizationRepository {
 
     override fun getOrganization(id: Int): Organization? {
@@ -71,5 +67,11 @@ WHERE
         }
 
         return dbOrganizations.map {it.toOrganization()}
+    }
+
+    companion object {
+        private fun DbOrganization.toOrganization(): Organization {
+            return Organization(this.id, this.name, this.token)
+        }
     }
 }

@@ -69,9 +69,12 @@ class OrganizationController(
         return OrganizationCollectionDto(orgs.map { mapToSummary(it)}).toJson()
     }
 
+    companion object {
+        private fun mapToSummary(org: Organization): OrganizationSummaryDto {
+            return OrganizationSummaryDto(org.id, org.name, org.token)
+        }
+    }
+
     private val gson = Gson()
 }
 
-private fun mapToSummary(org: Organization): OrganizationSummaryDto {
-    return OrganizationSummaryDto(org.id, org.name, org.token)
-}
