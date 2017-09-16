@@ -11,23 +11,31 @@ export function setCurrentUser(user, organizations) {
 	return { type: SET_CURRENT_USER, user, organizations };
 }
 
-export default function reducer(user = {}, action, appClient) {
-	// handle async events
-	switch (action.type) {
-	case GET_CURRENT_USER_ASYNC:
-		appClient.get('users/me', {
-				[httpCodes.OK]: result => action.asyncDispatch(setCurrentUser(result.user, result.organizations))
-			});
-		break;
-	}
+export function getReducer(appClient) {
+	return (user = {}, action) => {
+		// handle async events
+		switch (action.type) {
+		case GET_CURRENT_USER_ASYNC:
+			appClient.get('users/me', {
+					[httpCodes.OK]: result => action.asyncDispatch(setCurrentUser(result.user, result.organizations))
+				});
+			break;
+		}
 
-	switch (action.type) {
-    case SET_CURRENT_USER:
-        return {
-			...action.user,
-			organizations: action.organizations
-		};
-	}
+		switch (action.type) {
+		case SET_CURRENT_USER:
+			return {
+				...action.user,
+				organizations: action.organizations
+			};
+		}
 
-	return user;
+		return user;
+	}
 }
+
+export default {
+	getCurrentUser,
+	setCurrentUser,
+	getReducer,
+};

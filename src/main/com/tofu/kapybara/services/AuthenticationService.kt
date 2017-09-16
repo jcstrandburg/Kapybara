@@ -7,7 +7,7 @@ import spark.Request
 import spark.Response
 import java.util.*
 
-class AuthorizationService(val userRepository: IUserRepository) {
+class AthenticationService(val userRepository: IUserRepository) {
     /**
      * Gets the currently authenticated user via cookies
      */

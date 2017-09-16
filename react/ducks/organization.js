@@ -32,30 +32,40 @@ export function getOrganization(token) {
     return { type: GET_ASYNC, token };
 }
 
-export default function reducer(organizations = {}, action, appClient) {
-    // handle async events
-    switch (action.type) {
-    case CREATE_ASYNC:
-        appClient.post('organizations', { organization: action.organization }, {
-                [httpCodes.CREATED]: organization => action.asyncDispatch(organizationsUpdated([organization]))
+export function getReducer(appClient) {
+    return (organizations = {}, action) => {
+        // handle async events
+        switch (action.type) {
+        case CREATE_ASYNC:
+            appClient.post('organizations', { organization: action.organization }, {
+                    [httpCodes.CREATED]: organization => action.asyncDispatch(organizationsUpdated([organization]))
+                });
+            break;
+        case GET_ASYNC:
+            appClient.get('organizations/'+action.token, {
+                    [httpCodes.OK]: organization => action.asyncDispatch(organizationsUpdated([organization]))
+                });
+            break;
+        case GET_FOR_CURRENT_USER_ASYNC:
+            appClient.get('users/me/organzations/', {
+                [httpCodes.OK]: result => action.asyncDispatch(organizationsUpdates(result.organizations))
             });
-        break;
-    case GET_ASYNC:
-        appClient.get('organizations/'+action.token, {
-                [httpCodes.OK]: organization => action.asyncDispatch(organizationsUpdated([organization]))
-            });
-        break;
-    case GET_FOR_CURRENT_USER_ASYNC:
-        appClient.get('users/me/organzations/', {
-            [httpCodes.OK]: result => action.asyncDispatch(organizationsUpdates(result.organizations))
-        });
-        break;
-    }
+            break;
+        }
 
-    switch (action.type) {
-    case UPDATED:
-        return Object.assign({}, organizations, toDict(action.organizations, it => it.token));
-    default:
-        return organizations;
-    }
+        switch (action.type) {
+        case UPDATED:
+            return Object.assign({}, organizations, toDict(action.organizations, it => it.token));
+        default:
+            return organizations;
+        }
+    };
 }
+
+export default {
+    createOrganization,
+    organizationsUpdated,
+    getForCurrentUser,
+    getOrganization,
+    getReducer,
+};

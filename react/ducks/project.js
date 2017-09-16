@@ -27,25 +27,34 @@ export function projectsUpdated(projects) {
     return { type: UPDATED, projects };
 }
 
-export default function reducer(projects = {}, action, appClient) {
-    // handle async events
-    switch (action.type) {
-    case CREATE_ASYNC:
-        appClient.post('projects', { project: action.project }, {
-                [httpCodes.CREATED]: result => action.asyncDispatch(projectsUpdated([result]))
-            });
-        break;
-    case GET_FOR_ORGANIZATION_ASYNC:
-        appClient.get('organizations/'+action.organizationToken+'/projects'+appClient.urlEncode({ parent: action.parentProjectId }), {
-                [httpCodes.OK]: result => action.asyncDispatch(projectsUpdated(result.projects))
-            });
-        break;
-    }
+export function getReducer(appClient) {
+    return (projects = {}, action) => {
+        // handle async events
+        switch (action.type) {
+        case CREATE_ASYNC:
+            appClient.post('projects', { project: action.project }, {
+                    [httpCodes.CREATED]: result => action.asyncDispatch(projectsUpdated([result]))
+                });
+            break;
+        case GET_FOR_ORGANIZATION_ASYNC:
+            appClient.get('organizations/'+action.organizationToken+'/projects'+appClient.urlEncode({ parent: action.parentProjectId }), {
+                    [httpCodes.OK]: result => action.asyncDispatch(projectsUpdated(result.projects))
+                });
+            break;
+        }
 
-    switch (action.type) {
-    case UPDATED:
-        return Object.assign({}, projects, toDict(action.projects, it => it.id));
-    default:
-        return projects;
-    }
+        switch (action.type) {
+        case UPDATED:
+            return Object.assign({}, projects, toDict(action.projects, it => it.id));
+        default:
+            return projects;
+        }
+    };
 }
+
+export default {
+    createProject,
+    getOrganizationProjects,
+    projectsUpdated,
+    getReducer,
+};

@@ -5,12 +5,12 @@ import { combineReducers, createStore, applyMiddleware  } from 'redux';
 import { ConnectedRouter, routerReducer, routerMiddleware } from 'react-router-redux';
 import createHistory from 'history/createBrowserHistory';
 
-import * as projects from './ducks/project';
-import * as organizations from './ducks/organization';
-import * as user from './ducks/user';
-import * as users from './ducks/users';
-import * as comments from './ducks/comments';
-import * as debug from './ducks/debug';
+import projects from './ducks/project';
+import organizations from './ducks/organization';
+import user from './ducks/user';
+import users from './ducks/users';
+import comments from './ducks/comments';
+import debug from './ducks/debug';
 
 import middlewares from './middlewares.js';
 import appClient from './util/appClient.js';
@@ -31,10 +31,8 @@ class LazyLoaderCache {
         if (this.keysLoaded[key])
             return;
 
-        console.log('Lazy loading key '+key);
         this.keysLoaded[key] = true;
         load();
-        console.log('Called load '+key);        
     }
 }
 
@@ -62,34 +60,32 @@ const userLazyLoaderCache = new LazyLoaderCache();
 const history = createHistory({
     basename: '/app',
 });
+
 const store = createStore(
     combineReducers({
-        user: (state, action) => user.default(state, action, appClient),
-        users: (state, action) => users.default(state, action, appClient),
-        projects: (state, action) => projects.default(state, action, appClient),
-        organizations: (state, action) => organizations.default(state, action, appClient),
-        comments: (state, action) => comments.default(state, action, appClient),
-        debug: debug.default,
+        user: user.getReducer(appClient),
+        users: users.getReducer(appClient),
+        projects: projects.getReducer(appClient),
+        organizations: organizations.getReducer(appClient),
+        comments: comments.getReducer(appClient),
+        debug: debug.reducer,
         routing: routerReducer,
     }),
     applyMiddleware(
         routerMiddleware(history),
-        //middlewares.actionLogMiddleware,
         middlewares.asyncDispatchMiddleware
     )
 );
 
-const SProjects = connect(
-    (state, ownProps) => {
-        return {
-            organizations: state.organizations,
-            projects: state.projects,
-            projectId: ownProps.projectId,
-            users: state.users,
-            comments: (ownProps.projectId && state.comments.byProjectId[ownProps.projectId]) || [],
-            userRepository: new UserRepository(state.users, userLazyLoaderCache),
-        };
-    },
+const ConnectedProjects = connect(
+    (state, ownProps) => ({
+        organizations: state.organizations,
+        projects: state.projects,
+        projectId: ownProps.projectId,
+        users: state.users,
+        comments: (ownProps.projectId && state.comments.byProjectId[ownProps.projectId]) || [],
+        userRepository: new UserRepository(state.users, userLazyLoaderCache),
+    }),
     (dispatch) => ({
         onLoad: (organizationToken) => {
             dispatch(organizations.getOrganization(organizationToken));
@@ -113,7 +109,7 @@ const SProjects = connect(
     }),
 )(Projects);
 
-const SChat = connect(
+const ConnectedChat = connect(
     (state) => ({
         organizations: state.organizations,
         projects: state.projects
@@ -122,7 +118,7 @@ const SChat = connect(
     }),
 )(Chat);
 
-const SLayout = connect(
+const ConnectedLayout = connect(
     (state) => ({
         projects: state.projects,
         chatChannels: [],
@@ -134,7 +130,7 @@ const SLayout = connect(
     })
 )(Layout);
 
-const SDebugger = connect(
+const ConnectedDebugger = connect(
     (state) => {
         let { debug, ...coreState } = state;
 
@@ -164,23 +160,23 @@ const App = () => {
                         )(Home)} />
                         <Route exact path="/settings" component={SettingsPanel} />
                         <Route path="/:org" component={(x) =>
-                            (<SLayout organizationToken={x.match.params.org}>
+                            (<ConnectedLayout organizationToken={x.match.params.org}>
                                 <Route exact path={x.match.url+'/projects'} component={(y) =>
-                                    (<SProjects organizationToken={x.match.params.org} />)
+                                    (<ConnectedProjects organizationToken={x.match.params.org} />)
                                 } />
                                 <Route path={x.match.url+'/projects/:projectId'} component={(y) =>
-                                    (<SProjects organizationToken={x.match.params.org} projectId={y.match.params.projectId} />)
+                                    (<ConnectedProjects organizationToken={x.match.params.org} projectId={y.match.params.projectId} />)
                                 } />
                                 <Route path={x.match.url+'/chat/:channel'} component={(y) =>
-                                    (<SChat organizationToken={x.match.params.org} channel={y.match.params.channel} />)
+                                    (<ConnectedChat organizationToken={x.match.params.org} channel={y.match.params.channel} />)
                                 } />
-                            </SLayout>)
+                            </ConnectedLayout>)
                         } />
                         <Route path='/*' component={NotFound} />
                     </Switch>
                 </div>
             </ConnectedRouter>
-            {debugEnabled ? <SDebugger /> : null}
+            {debugEnabled ? <ConnectedDebugger /> : null}
         </div>
     </Provider>
 };

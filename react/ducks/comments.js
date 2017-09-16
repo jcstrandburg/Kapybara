@@ -35,36 +35,45 @@ const initialState = {
     byProjectId: {}
 };
 
-export default function reducer(comments = initialState, action, appClient) {
-    // handle async events
-    switch (action.type) {
-    case GET_FOR_PROJECT_ASYNC:
-        appClient.get('projects/'+action.projectId+'/comments', {
-                [httpCodes.OK]: result => action.asyncDispatch(commentsUpdated(action.projectId, result.comments))
-            });
-        break;
-    case POST_ASYNC:
-        appClient.post(
-            'projects/'+action.projectId+'/comments',
-            {
-                content: action.content
-            },
-            {
-                [httpCodes.CREATED]: result => action.asyncDispatch(getProjectComments(action.projectId))
-            });
-        break;
-    }
+export function getReducer(appClient) {
+    return (comments = initialState, action) => {
+        // handle async events
+        switch (action.type) {
+        case GET_FOR_PROJECT_ASYNC:
+            appClient.get('projects/'+action.projectId+'/comments', {
+                    [httpCodes.OK]: result => action.asyncDispatch(commentsUpdated(action.projectId, result.comments))
+                });
+            break;
+        case POST_ASYNC:
+            appClient.post(
+                'projects/'+action.projectId+'/comments',
+                {
+                    content: action.content
+                },
+                {
+                    [httpCodes.CREATED]: result => action.asyncDispatch(getProjectComments(action.projectId))
+                });
+            break;
+        }
 
-    switch (action.type) {
-    case COMMENTS_UPDATED:
-        return {
-            ...comments,
-            byProjectId: {
-                ...comments.byProjectId,
-                [action.projectId]: action.comments,
-            }
-        };
-    default:
-        return comments;
-    }
+        switch (action.type) {
+        case COMMENTS_UPDATED:
+            return {
+                ...comments,
+                byProjectId: {
+                    ...comments.byProjectId,
+                    [action.projectId]: action.comments,
+                }
+            };
+        default:
+            return comments;
+        }
+    };
 }
+
+export default {
+    getProjectComments,
+    postProjectComment,
+    commentsUpdated,
+    getReducer,
+};
