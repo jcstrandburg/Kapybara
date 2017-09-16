@@ -1,6 +1,7 @@
 package com.tofu.kapybara.apiv1
 
 import com.google.gson.Gson
+import com.tofu.kapybara.StatusCode
 import com.tofu.kapybara.apiv1.dtos.*
 import com.tofu.kapybara.data.IOrganizationRepository
 import com.tofu.kapybara.data.IProjectRepository
@@ -29,7 +30,7 @@ class ProjectController(
     }
 
     private fun createProject(req: Request, res: Response): Any? {
-        val user = authenticationService.getLoggedInUser(req) ?: return halt(401)
+        val user = authenticationService.getLoggedInUser(req) ?: return halt(StatusCode.UNAUTHORIZED)
 
         val createDto = gson.fromJson(req.body(), ProjectCreateDto::class.java)
         val project = ProjectCreate(
@@ -38,11 +39,11 @@ class ProjectController(
             parentProjectId=createDto.project.parentProjectId)
 
         if (!userRepository.isUserInOrganization(user.id, project.organizationId))
-            return halt(404)
+            return halt(StatusCode.NOT_FOUND)
 
         val createdProject = projectRepository.createProject(project)
 
-        res.status(201)
+        res.status(StatusCode.CREATED)
         return ProjectSummaryDto(
                 createdProject.id,
                 createdProject.name,
@@ -52,10 +53,10 @@ class ProjectController(
     }
 
     private fun getProject(req: Request): Any? {
-        authenticationService.getLoggedInUser(req) ?: return halt(401)
+        authenticationService.getLoggedInUser(req) ?: return halt(StatusCode.UNAUTHORIZED)
 
-        val projectId = req.params("projectId").toIntOrNull() ?: return halt(400)
-        val project = projectRepository.getProject(projectId) ?: return halt(404)
+        val projectId = req.params("projectId").toIntOrNull() ?: return halt(StatusCode.BAD_REQUEST)
+        val project = projectRepository.getProject(projectId) ?: return halt(StatusCode.NOT_FOUND)
 
         return ProjectSummaryDto(
                 id=project.id,
@@ -66,10 +67,10 @@ class ProjectController(
     }
 
     private fun getProjectsForOrganization(req: Request): Any? {
-        authenticationService.getLoggedInUser(req) ?: return halt(401)
-        val orgToken = req.params("orgToken") ?: return halt(400)
+        authenticationService.getLoggedInUser(req) ?: return halt(StatusCode.UNAUTHORIZED)
+        val orgToken = req.params("orgToken") ?: return halt(StatusCode.BAD_REQUEST)
         val parentProjectId = req.queryParams("parent")?.toIntOrNull()
-        val organization = organizationRepository.getOrganization(orgToken) ?: return halt(404)
+        val organization = organizationRepository.getOrganization(orgToken)?: return halt(StatusCode.NOT_FOUND)
 
         val projects = projectRepository.getProjectsForOrganization(organization.id, parentProjectId)
 
@@ -80,21 +81,22 @@ class ProjectController(
     }
 
     private fun createProjectComment(req: Request, res: Response): Any? {
-        val user = authenticationService.getLoggedInUser(req) ?: return halt(401)
-        val projectId = req.params("projectId").toIntOrNull() ?: return halt(400)
-        val project = projectRepository.getProject(projectId) ?: return halt(404)
+        val user = authenticationService.getLoggedInUser(req) ?: return halt(StatusCode.UNAUTHORIZED)
+        val projectId = req.params("projectId").toIntOrNull() ?: return halt(StatusCode.BAD_REQUEST)
+        val project = projectRepository.getProject(projectId) ?: return halt(StatusCode.NOT_FOUND)
+
         val organization = organizationRepository.getOrganization(project.organizationId)
             ?: throw InvalidStateException("Unable to locate organization $project.organizationId")
 
         if (!userRepository.isUserInOrganization(user.id, organization.id))
-            return halt(404)
+            return halt(StatusCode.NOT_FOUND)
 
         val createDto = gson.fromJson(req.body(), DiscussionCommentCreateDto::class.java)
         val message = projectRepository.addDiscussionMessage(
             projectId,
             DiscussionMessageCreate(user.id, createDto.content))
 
-        res.status(201)
+        res.status(StatusCode.CREATED)
         return DiscussionCommentDto(
                 id=message.id,
                 userId=message.userId,
@@ -104,14 +106,14 @@ class ProjectController(
     }
 
     private fun getProjectComments(req: Request): Any? {
-        val user = authenticationService.getLoggedInUser(req) ?: return halt(401)
-        val projectId = req.params("projectId").toIntOrNull() ?: return halt(400)
-        val project = projectRepository.getProject(projectId) ?: return halt(404)
+        val user = authenticationService.getLoggedInUser(req) ?: return halt(StatusCode.UNAUTHORIZED)
+        val projectId = req.params("projectId").toIntOrNull() ?: return halt(StatusCode.BAD_REQUEST)
+        val project = projectRepository.getProject(projectId) ?: return halt(StatusCode.NOT_FOUND)
         val organization = organizationRepository.getOrganization(project.organizationId)
             ?: throw InvalidStateException("Unable to locate organization $project.organizationId")
 
         if (!userRepository.isUserInOrganization(user.id, organization.id))
-            return halt(404)
+            return halt(StatusCode.NOT_FOUND)
 
         val messages = projectRepository.getDiscussionMessages(projectId)
         return DiscussionCommentCollectionDto(

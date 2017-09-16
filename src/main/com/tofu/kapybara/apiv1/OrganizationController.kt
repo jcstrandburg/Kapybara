@@ -1,6 +1,7 @@
 package com.tofu.kapybara.apiv1
 
 import com.google.gson.Gson
+import com.tofu.kapybara.StatusCode
 import com.tofu.kapybara.apiv1.dtos.OrganizationCollectionDto
 import com.tofu.kapybara.apiv1.dtos.OrganizationCreateDto
 import com.tofu.kapybara.apiv1.dtos.OrganizationSummaryDto
@@ -32,7 +33,7 @@ class OrganizationController(
     }
 
     private fun createOrganization(req: Request, res: Response): Any? {
-        val user = authenticationService.getLoggedInUser(req) ?: return halt(401)
+        val user = authenticationService.getLoggedInUser(req) ?: return halt(StatusCode.UNAUTHORIZED)
 
         val organizationCreate = gson.fromJson(req.body(), OrganizationCreateDto::class.java)
         val organization = OrganizationCreate(
@@ -41,27 +42,27 @@ class OrganizationController(
 
         val existingOrganization = organizationRepository.getOrganization(organization.token)
         if (existingOrganization != null)
-            return halt(409)
+            return halt(StatusCode.CONFLICT)
 
         val createdOrganization = organizationRepository.createOrganization(organization)
 
         userRepository.addUserToOrganization(user.id, createdOrganization.id)
 
-        res.status(201)
+        res.status(StatusCode.CREATED)
         return mapToSummary(createdOrganization).toJson()
     }
 
     private fun getOrganization(req: Request, res: Response): Any? {
-        authenticationService.getLoggedInUser(req) ?: return halt(401)
+        authenticationService.getLoggedInUser(req) ?: return halt(StatusCode.UNAUTHORIZED)
 
         val token = req.params("orgToken")
-        val org = organizationRepository.getOrganization(token) ?: return halt(404)
+        val org = organizationRepository.getOrganization(token) ?: return halt(StatusCode.NOT_FOUND)
 
         return mapToSummary(org).toJson()
     }
 
     private fun getCurrentUserOrganizations(req: Request, res: Response): Any? {
-        val user = authenticationService.getLoggedInUser(req) ?: return halt(401)
+        val user = authenticationService.getLoggedInUser(req) ?: return halt(StatusCode.UNAUTHORIZED)
 
         val orgs = organizationRepository.getOrganizationsForUser(user.id)
 

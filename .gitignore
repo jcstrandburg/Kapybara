@@ -28,3 +28,5 @@ src/main/com/tofu/kapybara/scripts/sandbox\.kt
 react/npm-debug\.log
 
 npm-debug\.log
+
+\.idea/dictionaries/

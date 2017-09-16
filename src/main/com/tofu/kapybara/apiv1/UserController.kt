@@ -1,5 +1,6 @@
 package com.tofu.kapybara.apiv1
 
+import com.tofu.kapybara.StatusCode
 import com.tofu.kapybara.apiv1.dtos.CurrentUserDto
 import com.tofu.kapybara.apiv1.dtos.OrganizationSummaryDto
 import com.tofu.kapybara.apiv1.dtos.UserDto
@@ -26,7 +27,7 @@ class UserController(
     }
 
     private fun  getCurrentUser(req: Request, res: Response): Any? {
-        val user = authenticationService.getLoggedInUser(req) ?: return halt(401)
+        val user = authenticationService.getLoggedInUser(req) ?: return halt(StatusCode.UNAUTHORIZED)
         val organizations = organizationRepository.getOrganizationsForUser(user.id)
 
         return CurrentUserDto(
@@ -42,10 +43,10 @@ class UserController(
     }
 
     private fun getUser(req: Request, res: Response): Any? {
-        authenticationService.getLoggedInUser(req) ?: return halt(401)
-        val userId = req.params(":userId")?.toIntOrNull() ?: return halt(400)
+        authenticationService.getLoggedInUser(req) ?: return halt(StatusCode.UNAUTHORIZED)
+        val userId = req.params(":userId")?.toIntOrNull() ?: return halt(StatusCode.BAD_REQUEST)
 
-        val user = userRepository.getUser(userId) ?: return halt(404)
+        val user = userRepository.getUser(userId) ?: return halt(StatusCode.NOT_FOUND)
         return UserDto(
                 id=user.id,
                 name=user.name,
