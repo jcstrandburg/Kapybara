@@ -51,37 +51,33 @@ const style = {
 
 export default class Debugger extends React.Component {
     state = {
-        open: true
-    };
-
-    state = {
-        activePanel: 1
+        open: true,
+        activePanel: 1,
     };
 
     toggle = (event) => {
         this.setState({open: !this.state.open});
     }
 
-    render() {
-        return (
-            <div style={style} id="debug-panel">
-                {this.state.open
-                    ? (
+    render = () => (
+        <div style={style} id="debug-panel">
+            {this.state.open
+                ? (
+                    <div>
                         <div>
-                            <div>
-                                <button onClick={() => this.setState({ activePanel: 1 })}>State</button>
-                                <button onClick={() => this.setState({ activePanel: 2 })}>History</button>
-                                <button onClick={this.toggle}>🐛</button>
-                            </div>
-                            <div className="debug-content">
-                                {this.state.activePanel == 1
-                                ? <ObjectDump object={this.props.state} />
-                                : <ActionHistory history={this.props.actionHistory} />
-                                }
-                            </div>
-                        </div>)
-                    : <button onClick={this.toggle}>🐛</button>}
-            </div>
-        );
-    }
+                            <button onClick={() => this.setState({ activePanel: 1 })}>State</button>
+                            <button onClick={() => this.setState({ activePanel: 2 })}>History</button>
+                            <button onClick={this.toggle}>🐛</button>
+                        </div>
+                        <div className="debug-content">
+                            {this.state.activePanel == 1
+                            ? <ObjectDump object={this.props.state} />
+                            : <ActionHistory history={this.props.actionHistory} />
+                            }
+                        </div>
+                    </div>
+                )
+                : <button onClick={this.toggle}>🐛</button>}
+        </div>
+    )
 }
