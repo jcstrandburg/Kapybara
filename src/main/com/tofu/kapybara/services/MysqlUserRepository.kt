@@ -17,7 +17,7 @@ INSERT INTO `Users`
 VALUES
 (:username,:password, :alias, :email)
 """
-        val userId = sql2o.open().createQuery(sql).use {query ->
+        val userId = sql2o.open().createQuery(sql).use { query ->
             query.addParameter("username", user.name)
                 .addParameter("password", user.password)
                 .addParameter("alias", user.alias)
@@ -32,7 +32,7 @@ VALUES
     override fun getUser(name: String): User? {
         val sql = "SELECT ${dbFields(DbUser::class)} FROM `Users` WHERE `username`=:name LIMIT 1"
 
-        val dbUser = sql2o.open().createQuery(sql).use {query->
+        val dbUser = sql2o.open().createQuery(sql).use { query->
             query.addParameter("name", name)
                 .executeAndFetch(DbUser::class.java)
                 .singleOrNull()
@@ -43,7 +43,7 @@ VALUES
 
     override fun getUser(id: Int): User? {
         val sql = "SELECT ${dbFields(DbUser::class)} FROM `Users` WHERE `id`=:id LIMIT 1"
-        val dbUser = sql2o.open().createQuery(sql).use {query ->
+        val dbUser = sql2o.open().createQuery(sql).use { query ->
             query.addParameter("id", id)
                 .executeAndFetch(DbUser::class.java)
                 .singleOrNull()
@@ -74,7 +74,7 @@ WHERE
 id=:user.Id
 """
 
-        sql2o.open().createQuery(sql).use {query ->
+        sql2o.open().createQuery(sql).use { query ->
             query.addParameter("username", user.name)
                 .addParameter("password", user.password)
                 .executeUpdate()
@@ -144,7 +144,7 @@ WHERE
                 .executeAndFetch(DbUser::class.java)
         }
 
-        return dbUsers.map {it.toUser()}
+        return dbUsers.map { it.toUser() }
     }
 
     companion object {

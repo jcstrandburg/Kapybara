@@ -30,7 +30,7 @@ VALUES
     (:name, :organizationId, :discussionContextId, :parentProjectId)
 """
         val discussionContextId = discussionContextService.createContext()
-        val id = sql2o.open().createQuery(sql).use {query ->
+        val id = sql2o.open().createQuery(sql).use { query ->
             query
                 .addParameter("name", project.name)
                 .addParameter("organizationId", project.organizationId)
@@ -52,7 +52,7 @@ WHERE
     AND ${if (parentProjectId == null) "parentProjectId IS NULL" else "parentProjectId=:parentProjectId"}
 """
 
-        val dbProjects = sql2o.open().createQuery(sql).use {query ->
+        val dbProjects = sql2o.open().createQuery(sql).use { query ->
             if (parentProjectId == null) {
                 query
                     .addParameter("organizationId", organizationId)
@@ -76,7 +76,7 @@ INSERT INTO `DiscussionMessages`
 VALUES
     (:discussionContextId, :userId, :content, :createdTime)
 """
-        val id = sql2o.open().createQuery(sql).use {query ->
+        val id = sql2o.open().createQuery(sql).use { query ->
             query
                 .addParameter("discussionContextId", project.discussionContextId)
                 .addParameter("userId", message.userId)
@@ -96,7 +96,7 @@ FROM
 WHERE p.id=:projectId
 ORDER BY dm.id ASC
 """
-        val messages = sql2o.open().createQuery(sql).use {query ->
+        val messages = sql2o.open().createQuery(sql).use { query ->
             query
                 .addParameter("projectId", projectId)
                 .executeAndFetch(DbDiscussionMessage::class.java)
@@ -107,7 +107,7 @@ ORDER BY dm.id ASC
     private fun getProjectCore(projectId: Int): DbProject? {
         val sql = "SELECT ${dbFields(DbProject::class)} FROM `Projects` WHERE id=:projectId"
 
-        return sql2o.open().createQuery(sql).use {query ->
+        return sql2o.open().createQuery(sql).use { query ->
             query
                 .addParameter("projectId", projectId)
                 .executeAndFetch(DbProject::class.java)
@@ -121,7 +121,7 @@ SELECT ${dbFields(DbDiscussionMessage::class)}
 FROM `DiscussionMessages`
 WHERE id=:discussionMessageId
 """
-        return sql2o.open().createQuery(sql).use {query ->
+        return sql2o.open().createQuery(sql).use { query ->
             query.addParameter("discussionMessageId", discussionMessageId)
                 .executeAndFetch(DbDiscussionMessage::class.java)
                 .single()

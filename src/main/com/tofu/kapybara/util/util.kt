@@ -7,16 +7,16 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredMemberProperties
 
 inline fun dbFields(dbClass: KClass<*>): String {
-    return dbClass.declaredMemberProperties.map{it.name}.joinToString(",")
+    return dbClass.declaredMemberProperties.map { it.name }.joinToString(",")
 }
 
 fun dbFields(dbClass: KClass<*>, name: String): String {
-    return dbClass.declaredMemberProperties.map{"$name.${it.name}"}.joinToString(",")
+    return dbClass.declaredMemberProperties.map { "$name.${it.name}" }.joinToString(",")
 }
 
 fun splitQuery(query: String): Map<String, String> {
     val query_pairs = LinkedHashMap<String, String>()
-    val pairs = query.split("&".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+    val pairs = query.split("&".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     for (pair in pairs) {
         val idx = pair.indexOf("=")
 

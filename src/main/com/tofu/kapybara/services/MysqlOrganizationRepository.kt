@@ -66,7 +66,7 @@ WHERE
             query.addParameter("userId", userId).executeAndFetch(DbOrganization::class.java)
         }
 
-        return dbOrganizations.map {it.toOrganization()}
+        return dbOrganizations.map { it.toOrganization() }
     }
 
     companion object {

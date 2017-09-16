@@ -7,7 +7,7 @@ class MysqlDiscussionContextService(val sql2o: Sql2o) {
     fun createContext(): Int {
         val sql = "INSERT INTO `DiscussionContexts` VALUES ()"
 
-        val contextId = sql2o.open().createQuery(sql).use {query ->
+        val contextId = sql2o.open().createQuery(sql).use { query ->
             query.executeUpdate().key as BigInteger
         }
 

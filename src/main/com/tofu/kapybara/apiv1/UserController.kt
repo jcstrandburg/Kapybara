@@ -35,10 +35,11 @@ class UserController(
                     id=user.id,
                     name=user.name,
                     alias=user.alias),
-                organizations.map{OrganizationSummaryDto(
+                organizations.map { OrganizationSummaryDto(
                     id=it.id,
                     name=it.name,
-                    token=it.token)})
+                    token=it.token)
+                })
             .toJson()
     }
 
