@@ -8,13 +8,22 @@ import java.util.*
 
 class AppController(val authenticationService: AuthenticationService) {
     init {
-        get("/app") { req, res -> serveApp(req, res) }
-        get("/app/*") { req, res -> serveApp(req, res) }
+        get(Routes.APP) { req, res -> serveApp(req, res) }
+        get(Routes.APP_WILDCARD) { req, res -> serveApp(req, res) }
     }
 
     private fun serveApp(req: Request, res: Response): Any? {
-        authenticationService.getLoggedInUser(req) ?: return res.redirect("/auth/signin")
+        val user = authenticationService.getLoggedInUser(req)
 
+        if (user == null) {
+            authenticationService.setLogInSuccessRedirectUri(req.uri(), res)
+            return res.redirect(Routes.SIGN_IN)
+        }
+        else {
+            authenticationService.clearLogInSuccessRedirectUri(res)
+        }
+
+        // TODO: smarter cache buster
         val cacheBuster = UUID.randomUUID()
         return """
 <!DOCTYPE html>
@@ -27,7 +36,7 @@ class AppController(val authenticationService: AuthenticationService) {
     <body>
         <div id="app" class="app-container">
             Hello world
-            <a href="/auth/signout">Log Out</a>
+            <a href="${Routes.SIGN_OUT}">Log Out</a>
         </div>
         <script src="/index.js?$cacheBuster"></script>
     </body>

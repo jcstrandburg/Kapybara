@@ -10,18 +10,19 @@ import spark.Spark.post
 class AuthenticationController(val authenticationService: AuthenticationService) {
 
     init{
-        get("/auth/signin") { req, res -> signInForm(req, res) }
-        post("/auth/signin") { req, res -> doSignIn(req, res) }
-        get("/auth/signout") { req, res -> logOut(req, res) }
+        get(Routes.SIGN_IN) { req, res -> signInForm(req, res) }
+        post(Routes.SIGN_IN) { req, res -> doSignIn(req, res) }
+        get(Routes.SIGN_OUT) { req, res -> logOut(req, res) }
     }
 
     private fun signInForm(req: Request, res: Response): Any? {
         val user = authenticationService.getLoggedInUser(req)
         if (user != null)
-            return res.redirect("/app")
+            return res.redirect(Routes.APP)
 
         val err: String
         val auth_error:String? = req.session().attribute("auth_error")
+
         if (auth_error != null) {
             req.session().attribute("auth_error", null)
             err = "<div>$auth_error</div>";
@@ -51,15 +52,15 @@ class AuthenticationController(val authenticationService: AuthenticationService)
         val authenticatedUser = authenticationService.logInUser(formData["username"]!!, formData["password"]!!, res)
 
         if (authenticatedUser != null) {
-            return res.redirect("/app")
+            return res.redirect(authenticationService.getLogInSuccessRedirectUri(req) ?: Routes.APP)
         } else {
             req.session().attribute("auth_error", "Unable to login with these credentials")
-            return res.redirect("/auth/signin")
+            return res.redirect(Routes.SIGN_IN)
         }
     }
 
     private fun logOut(req: Request, res: Response): Any? {
         authenticationService.logOutUser(res)
-        return res.redirect("/auth/signin")
+        return res.redirect(Routes.SIGN_IN)
     }
 }

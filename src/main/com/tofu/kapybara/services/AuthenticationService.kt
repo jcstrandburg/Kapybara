@@ -12,8 +12,8 @@ class AuthenticationService(val userRepository: IUserRepository) {
      * Gets the currently authenticated user via cookies
      */
     fun getLoggedInUser(request: Request): User? {
-        val username = request.cookie("username")
-        val authToken = request.cookie("authToken")
+        val username = request.cookie(USERNAME_COOKIE)
+        val authToken = request.cookie(AUTH_TOKEN_COOKIE)
         if (username == null || authToken == null)
             return null
 
@@ -27,20 +27,30 @@ class AuthenticationService(val userRepository: IUserRepository) {
         if (BCrypt.checkpw(plainPassword, user.password)) {
             val authenticatedUser = userRepository.setUserAuthToken(user.id, UUID.randomUUID().toString())
 
-            setCookie(response, "username", authenticatedUser.name)
-            setCookie(response, "authToken", authenticatedUser.authToken)
+            setCookie(response, USERNAME_COOKIE, authenticatedUser.name)
+            setCookie(response, AUTH_TOKEN_COOKIE, authenticatedUser.authToken)
 
             return authenticatedUser
         }
         return null
     }
 
-    fun hashPassword(plainPassword: String) = BCrypt.hashpw(plainPassword, BCrypt.gensalt(12))!!
+    fun hashPassword(plainPassword: String) =
+        BCrypt.hashpw(plainPassword, BCrypt.gensalt(12))!!
 
     fun logOutUser(response: Response) {
-        response.removeCookie("/", "username")
-        response.removeCookie("/", "authToken")
+        unsetCookie(response, USERNAME_COOKIE)
+        unsetCookie(response, AUTH_TOKEN_COOKIE)
     }
+
+    fun setLogInSuccessRedirectUri(uri: String, response: Response) =
+        setCookie(response, LOG_IN_REDIRECT_COOKIE, uri)
+
+    fun getLogInSuccessRedirectUri(request: Request): String? =
+        request.cookie(LOG_IN_REDIRECT_COOKIE)
+
+    fun clearLogInSuccessRedirectUri(response: Response) =
+        unsetCookie(response, LOG_IN_REDIRECT_COOKIE)
 
     private fun setCookie(response: Response, name: String, value: String) {
         response.cookie(
@@ -51,4 +61,12 @@ class AuthenticationService(val userRepository: IUserRepository) {
             false, // secure only
             false) // http only
     }
+
+    companion object {
+        private const val USERNAME_COOKIE = "username"
+        private const val AUTH_TOKEN_COOKIE = "authToken"
+        private const val LOG_IN_REDIRECT_COOKIE = "logInSuccessRedirect"
+    }
+
+    private fun unsetCookie(response: Response, name: String) = response.removeCookie("/", name)
 }
