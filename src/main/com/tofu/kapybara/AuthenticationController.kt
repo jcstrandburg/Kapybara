@@ -33,16 +33,16 @@ class AuthenticationController(val authenticationService: AuthenticationService)
         // todo: make this a real template
         return """
 <html>
-<head>
-</head>
-<body>
-    $err
-    <form method="POST">
-        Name: <input type="text" name="username"></input><br>
-        Password: <input type="password" name="password"></input><br>
-    <input type="submit" />
-</form>
-</body>
+    <head>
+    </head>
+    <body>
+        $err
+        <form method="POST">
+            Name: <input type="text" name="username"></input><br>
+            Password: <input type="password" name="password"></input><br>
+            <input type="submit" />
+        </form>
+    </body>
 </html>
 """
     }
