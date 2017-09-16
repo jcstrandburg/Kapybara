@@ -15,6 +15,7 @@ import debug from './ducks/debug';
 import middlewares from './middlewares.js';
 import appClient from './util/appClient.js';
 import toDict from './util/toDict';
+import LazyLoadCache from './util/LazyLoadCache.js';
 
 import Home from './components/Home.jsx';
 import Projects from './components/Projects.jsx';
@@ -24,29 +25,17 @@ import Layout from './components/Layout.jsx';
 import Debugger from './components/Debugger.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 
-class LazyLoaderCache {
-    keysLoaded = {};
-
-    startLazyLoad(key, load) {
-        if (this.keysLoaded[key])
-            return;
-
-        this.keysLoaded[key] = true;
-        load();
-    }
-}
-
 class UserRepository {
-    constructor(users, cache) {
+    constructor(users, lazyLoadCache) {
         this.users = users;
-        this.cache = cache;
+        this.lazyLoadCache = lazyLoadCache;
     }
 
     getOrLazyLoad(id, lazyLoad) {
         if (this.users[id])
             return this.users[id];
 
-        this.cache.startLazyLoad(id, () => lazyLoad(id));
+        this.lazyLoadCache.startLazyLoad(id, () => lazyLoad(id));
         return {
             id,
             name: 'loading...',
@@ -55,7 +44,7 @@ class UserRepository {
     }
 }
 
-const userLazyLoaderCache = new LazyLoaderCache();
+const userLazyLoaderCache = new LazyLoadCache();
 
 const history = createHistory({
     basename: '/app',
